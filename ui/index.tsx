@@ -1,9 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-
-const App = function () {
-  return <div>hello world workinggg</div>;
-};
+import { App } from "./App";
 
 const domContainer = document.querySelector("#APP_ROOT");
 console.log(domContainer);
