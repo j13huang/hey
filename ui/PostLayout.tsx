@@ -3,7 +3,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-export const PostView = function () {
+export const PostLayout = function () {
   return (
     <Container>
       <Row className="justify-content-md-center">

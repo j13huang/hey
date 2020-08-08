@@ -1,10 +1,12 @@
 import * as React from "react";
-import {PostView} from "./PostView";
+import {MainLayout} from "./MainLayout";
+import {Header} from "./Header";
 
 export const App: React.FC<{}> = function () {
   return (
     <div>
-      <PostView />
+      <Header />
+      <MainLayout />
     </div>
   );
 };
