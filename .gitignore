@@ -11,4 +11,4 @@ npm-debug.log
 Dockerfile
 docker-compose.yml
 
-public/js/*
+public/js/
