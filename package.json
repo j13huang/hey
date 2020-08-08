@@ -7,7 +7,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon",
     "webpack": "webpack --watch --mode development --config webpack.config.js",
     "test": "node test.js"
   },
@@ -25,7 +25,12 @@
   "devDependencies": {
     "@types/bootstrap": "^4.5.0",
     "@types/react-bootstrap": "^0.32.22",
+    "react-dom": "^16.13.1",
+    "ts-node": "^8.10.2",
+    "css-loader": "^4.2.1",
     "got": "^11.3.0",
+    "nodemon": "^2.0.4",
+    "style-loader": "^1.2.1",
     "tape": "^4.7.0",
     "ts-loader": "^8.0.2",
     "typescript": "^3.9.7",
