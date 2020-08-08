@@ -24,7 +24,7 @@ export const App: React.FC<{}> = function () {
       <Header />
       <MainLayout />
       <div>{cool()}hello world working</div>
-      <Posts users={users} />
+      {Object.keys(users).length > 0 && <Posts users={users} />}
     </div>
   );
 };
