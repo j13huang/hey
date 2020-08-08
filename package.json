@@ -8,12 +8,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "babel": "npx babel --watch ui --out-dir public/js --presets react-app/prod ",
+    "webpack": "webpack --watch --mode development --config webpack.config.js",
     "test": "node test.js"
   },
   "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2",
     "cool-ascii-faces": "^1.3.4",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
@@ -23,7 +21,11 @@
   },
   "devDependencies": {
     "got": "^11.3.0",
-    "tape": "^4.7.0"
+    "tape": "^4.7.0",
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   },
   "repository": {
     "type": "git",

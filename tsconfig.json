@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./public/js/",
+    "module": "commonjs",
+    "target": "es6",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "jsx": "react"
+  }
+}
