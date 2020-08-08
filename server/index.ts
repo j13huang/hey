@@ -40,6 +40,22 @@ express()
       res.send("Error " + err);
     }
   })
+  .get("/users", async (req, res) => {
+    try {
+      const client = await pool.connect();
+      const result = await client.query("SELECT * FROM users");
+      const users = {};
+      (result ? result.rows : []).forEach((r) => {
+        users[r.id] = r;
+      });
+      //console.log(users);
+      res.json(users);
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    }
+  })
   .get("/cool", (req, res) => res.send(cool()))
   .get("/times", (req, res) => res.send(showTimes()))
   .listen(PORT, () => console.log(`Listening on ${PORT}`));

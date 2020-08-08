@@ -1,7 +1,11 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 
-export const Posts: React.FC<{}> = function () {
+type Props = {
+  users: any;
+};
+
+export const Posts: React.FC<Props> = function ({ users }) {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -16,9 +20,18 @@ export const Posts: React.FC<{}> = function () {
 
   return (
     <div>
-      {posts.map((p, i) => (
-        <div key={i}>{JSON.stringify(p, null, 2)} </div>
-      ))}
+      {posts.map((p, i) => {
+        const user = users[p.user_id];
+        return (
+          <div key={i}>
+            <h3>{p.title} </h3>
+            <div>{p.content} </div>
+            <div>
+              {p.votes} votes - {user.name}{" "}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
