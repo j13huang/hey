@@ -8,9 +8,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
+    "build": "webpack -p",
     "webpack": "webpack --watch --mode development --config webpack.config.js",
-    "test": "node test.js",
-    "heroku-postbuild": "webpack -p"
+    "test": "node test.js"
   },
   "dependencies": {
     "@types/node": "^14.14.3",
