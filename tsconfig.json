@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./public/js/",
+    "outDir": "./dist/ui",
     "module": "es6",
     "target": "es2017",
     "strict": true,
@@ -8,5 +8,6 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "jsx": "react-jsx"
-  }
+  },
+  "include": ["./ui"]
 }
