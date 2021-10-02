@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    //"outDir": "./public/js/",
+    "module": "es6",
+    "target": "es2017",
+    "strict": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "jsx": "react-jsx"
+  }
+}

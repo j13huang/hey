@@ -1,0 +1,5 @@
+{
+  "name": "hey",
+  "description": "A barebones Node.js app using koa, vite, react",
+  "keywords": ["node", "koa", "heroku", "vite", "react"]
+}
