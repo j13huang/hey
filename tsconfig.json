@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    //"outDir": "./public/js/",
+    "outDir": "./public/js/",
     "module": "es6",
     "target": "es2017",
     "strict": true,
