@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "start": "nodemon"
+    "start": "ts-node-dev --respawn --transpile-only --project tsconfig.server.json ./server/index.ts"
   },
   "dependencies": {
     "@koa/router": "^10.1.1",
@@ -21,8 +21,8 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react": "^1.0.1",
-    "nodemon": "^2.0.13",
     "prettier": "^2.4.1",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.2",
     "vite": "^2.6.0"
   }
