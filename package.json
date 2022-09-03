@@ -5,23 +5,37 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "start": "ts-node-dev --respawn --transpile-only --project tsconfig.server.json ./server/index.ts"
+    "start": "ts-node-dev --respawn --transpile-only --project tsconfig.server.json ./server/index.ts",
+    "relay": "npx relay-compiler",
+    "schema": "npx tsc ./graphql/print-schema.ts  --outDir ./graphql/dist && node graphql/dist/graphql/print-schema.js"
   },
   "dependencies": {
     "@koa/router": "^10.1.1",
+    "graphql-relay": "^0.9.0",
     "koa": "^2.13.3",
+    "koa-graphql": "^0.12.0",
+    "koa-mount": "^4.0.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "ts-node": "^10.2.1"
+    "react-relay": "^14.1.0",
+    "relay-runtime": "^14.1.0",
+    "vite-plugin-relay": "^1.0.7"
   },
   "devDependencies": {
     "@types/koa": "^2.13.4",
     "@types/koa__router": "^8.0.8",
-    "@types/node": "^16.10.2",
+    "@types/koa-graphql": "^0.8.5",
+    "@types/koa-mount": "^4.0.1",
+    "@types/node": "^18.7.14",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-relay": "^14.1.1",
     "@vitejs/plugin-react": "^1.0.1",
+    "babel-plugin-relay": "^14.1.0",
+    "graphql": "^15.8.0",
     "prettier": "^2.4.1",
+    "relay-compiler": "^14.1.0",
+    "relay-compiler-language-typescript": "^15.0.1",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.2",
     "vite": "^2.6.0"
