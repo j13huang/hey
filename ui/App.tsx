@@ -4,8 +4,11 @@ import RelayEnvironment from "./lib/graphql/RelayEnvironment";
 
 //import { Homepage } from "./components/Homepage";
 import { graphql, loadQuery, usePreloadedQuery } from "react-relay";
+import { AppAllPostsQuery } from "./__generated__/AppAllPostsQuery.graphql";
+import { Post } from "./components/Post";
 
 import logo from "./logo.svg";
+import "./global.module.css";
 import "./App.css";
 
 // Define a query
@@ -36,11 +39,12 @@ const preloadedQuery = loadQuery(RelayEnvironment, AllPostsQuery, {
 });
 
 const Homepage1: React.FC<any> = (props) => {
-  const data = usePreloadedQuery(AllPostsQuery, props.preloadedQuery);
+  const data = usePreloadedQuery<AppAllPostsQuery>(AllPostsQuery, props.preloadedQuery);
 
   return (
     <div className="App">
       <header className="App-header">
+        <p>yoooo this is homepage 1</p>
         <p>{JSON.stringify(data, null, 2)}</p>
       </header>
     </div>
@@ -53,8 +57,11 @@ function App() {
   return (
     <div className="App">
       <RelayEnvironmentProvider environment={RelayEnvironment}>
-        <Suspense fallback={"Loading..."}>
+        <Suspense fallback={"Loading Homepage1..."}>
           <Homepage1 preloadedQuery={preloadedQuery} />
+        </Suspense>
+        <Suspense fallback={"Loading Post..."}>
+          <Post />
         </Suspense>
       </RelayEnvironmentProvider>
       <header className="App-header">

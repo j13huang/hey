@@ -1,0 +1,18 @@
+:global(p),
+:global(h1),
+:global(h2),
+:global(h3),
+:global(h4),
+:global(h5),
+:global(h6) {
+  margin: 0;
+}
+
+:global(ul) {
+  margin: 0;
+}
+
+.App {
+  text-align: center;
+  background-color: blue;
+}
