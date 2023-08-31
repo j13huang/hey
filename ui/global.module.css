@@ -1,3 +1,8 @@
+:global(body) {
+  background-color: #282c34;
+  color: rgb(203, 203, 203);
+}
+
 :global(p),
 :global(h1),
 :global(h2),

@@ -1,52 +1,54 @@
 import { useState } from "react";
+import { clsx } from "clsx";
 
 import "./Comment.css";
 
 type CommentProps = {
-  commentChildren?: any[];
+  className?: string;
   depth: number;
 };
 
 export const Comment: React.FC<CommentProps> = (props) => {
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!props.commentChildren || props.commentChildren.length === 0) {
+  if (props.depth > 3) {
     return null;
   }
 
-  if (props.depth > 5) {
-    return null;
-  }
-
-  const comments: any[] = [
-    {
-      id: "id",
-      //user: {  description: "user" },
-      body: "this is the comment body",
-      parentId: null,
-      //childrenIds: { type: GraphQLNonNull(GraphQLString), description: "childrenIds" },
-      childrenIds: "1,2,3,4,5",
-    },
-  ];
+  const comment = {
+    id: "id",
+    //user: {  description: "user" },
+    info: "this is the comment info",
+    body: "this is the comment body",
+    parentId: null,
+    //childrenIds: { type: GraphQLNonNull(GraphQLString), description: "childrenIds" },
+    childrenIds: props.depth === 3 ? "" : "1,2",
+  };
 
   return (
-    <ul>
+    <ul className={clsx("Comment", props.depth === 1 && "Comment--topLevel", props.className)}>
       <li>
-        <p>
-          hello comment{" "}
-          <span
-            className="Comment--collapseButton"
-            onClick={() => {
-              setIsVisible(!isVisible);
-            }}
-          >
-            {/* en-dash */}[{isVisible ? "–" : "+"}]
-          </span>
-        </p>
-        {isVisible && <p>comment data</p>}
+        <div className="Comment--container">
+          {comment.childrenIds ? (
+            <span
+              className="Comment--collapseButton"
+              onClick={() => {
+                setIsVisible(!isVisible);
+              }}
+            >
+              {/* en-dash */}[{isVisible ? "–" : "+"}]
+            </span>
+          ) : (
+            <span>&nbsp;&nbsp;&nbsp;</span>
+          )}
+          <div>
+            <p>{comment.info}</p>
+            {isVisible && <p>{comment.body}</p>}
+          </div>
+        </div>
         {isVisible &&
-          comments.map((c) => {
-            return <Comment commentChildren={c.childrenIds} depth={props.depth + 1} />;
+          comment.childrenIds.split(",").map((id) => {
+            return <Comment depth={props.depth + 1} />;
           })}
       </li>
     </ul>

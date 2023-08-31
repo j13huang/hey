@@ -1,3 +1,22 @@
+.Comment {
+  border-left: 1px solid white;
+  list-style-type: none;
+  margin-bottom: 8px;
+  margin-left: 8px;
+  padding-left: 16px;
+}
+
+.Comment--topLevel {
+  border: none;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
 .Comment--collapseButton {
   cursor: pointer;
+  margin-right: 4px;
+}
+
+.Comment--container {
+  display: flex;
 }

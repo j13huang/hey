@@ -7,7 +7,7 @@ export const Post: React.FC<any> = (props) => {
     id: "1",
     title: "first post",
     body: "yo",
-    comments: ["1"],
+    comments: ["1", "2", "3"],
   };
   const comments: any[] = [];
 
@@ -23,7 +23,7 @@ export const Post: React.FC<any> = (props) => {
       </div>
       <div className="Post--comments">
         {post.comments.map((c, i) => {
-          return <Comment commentChildren={[c]} depth={1} />;
+          return <Comment className="Post--comment" depth={1} />;
         })}
       </div>
     </div>

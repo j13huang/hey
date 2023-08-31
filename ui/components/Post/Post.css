@@ -1,5 +1,7 @@
 .Post {
-  text-align: left;
+  /*
+  display: inline-block;
+  */
 }
 
 .Post--body {
