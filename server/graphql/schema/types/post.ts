@@ -1,8 +1,9 @@
 import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull } from "graphql";
 import { connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
-import { commentType } from "./comment";
-import { nodeInterface, gloablId } from "./node";
-import { getComment } from "../../db/data";
+import { globalIdField } from "graphql-relay";
+import { nodeInterface } from "../node";
+import { CommentType } from "./comment";
+import { getComment } from "../../../db/data";
 
 /**
  * We define a connection between a post and its comments.
@@ -21,7 +22,7 @@ import { getComment } from "../../db/data";
  *   }
  */
 const { connectionType: commentConnection } = connectionDefinitions({
-  nodeType: commentType,
+  nodeType: CommentType,
 });
 
 /**
@@ -35,14 +36,15 @@ const { connectionType: commentConnection } = connectionDefinitions({
  *     comments: CommentConnection
  *   }
  */
-export const postType: GraphQLObjectType = new GraphQLObjectType({
+export const PostType = new GraphQLObjectType({
   name: "Post",
   description: "post",
   interfaces: [nodeInterface],
   fields: () => ({
-    id: gloablId,
+    id: globalIdField(),
     title: { type: GraphQLNonNull(GraphQLString), description: "title" },
     body: { type: GraphQLNonNull(GraphQLString), description: "body" },
+    link: { type: GraphQLString, description: "link (optional)" },
     comments: {
       type: commentConnection,
       description: "Comments for a post",
@@ -50,4 +52,10 @@ export const postType: GraphQLObjectType = new GraphQLObjectType({
       resolve: (post, args) => connectionFromArray(post.comments.map(getComment), args),
     },
   }),
+  /*
+  isTypeOf: (obj) => {
+    console.log("istypeofPost", obj, obj.toString());
+    return obj.__typeName === "Post";
+  },
+  */
 });

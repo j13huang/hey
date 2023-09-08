@@ -13,3 +13,6 @@ Dockerfile
 docker-compose.yml
 
 public/js/
+
+**/dist/
+**/__generated__/

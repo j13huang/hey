@@ -29,26 +29,22 @@ export const Comment: React.FC<CommentProps> = (props) => {
     <ul className={clsx("Comment", props.depth === 1 && "Comment--topLevel", props.className)}>
       <li>
         <div className="Comment--container">
-          {comment.childrenIds ? (
-            <span
-              className="Comment--collapseButton"
-              onClick={() => {
-                setIsVisible(!isVisible);
-              }}
-            >
-              {/* en-dash */}[{isVisible ? "–" : "+"}]
-            </span>
-          ) : (
-            <span>&nbsp;&nbsp;&nbsp;</span>
-          )}
+          <span
+            className="Comment--collapseButton"
+            onClick={() => {
+              setIsVisible(!isVisible);
+            }}
+          >
+            {/* en-dash */}[{isVisible ? "–" : "+"}]
+          </span>
           <div>
             <p>{comment.info}</p>
             {isVisible && <p>{comment.body}</p>}
           </div>
         </div>
         {isVisible &&
-          comment.childrenIds.split(",").map((id) => {
-            return <Comment depth={props.depth + 1} />;
+          comment.childrenIds.split(",").map((id, i) => {
+            return <Comment key={i} depth={props.depth + 1} />;
           })}
       </li>
     </ul>

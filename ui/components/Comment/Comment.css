@@ -17,6 +17,10 @@
   margin-right: 4px;
 }
 
+.Comment--collapseButtonSpacer {
+  user-select: none;
+}
+
 .Comment--container {
   display: flex;
 }

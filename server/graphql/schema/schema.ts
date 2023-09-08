@@ -1,12 +1,12 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLString } from "graphql";
-import { connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
-import { postType } from "./post";
-import { commentType } from "./comment";
+import { GraphQLSchema, GraphQLObjectType, GraphQLID, GraphQLNonNull, GraphQLString } from "graphql";
+import { fromGlobalId, connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
+import { PostType } from "./types/post";
+import { CommentType } from "./types/comment";
 import { allPosts, allComments } from "../../db/data";
 import { nodeField } from "./node";
 
-const { connectionType: postConnection } = connectionDefinitions({
-  nodeType: postType,
+const { connectionType: PostConnection } = connectionDefinitions({
+  nodeType: PostType,
 });
 
 /**
@@ -24,23 +24,42 @@ const queryType = new GraphQLObjectType({
   name: "Query",
   fields: () => ({
     allPosts: {
-      type: postConnection,
+      type: PostConnection,
       description: "posts",
       args: connectionArgs,
-      resolve: (_obj, args) => connectionFromArray(Object.values(allPosts), args),
+      resolve: async (_obj, args) => {
+        //console.log("SLEEPING", allPosts);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        return connectionFromArray(Object.values(allPosts), args);
+      },
     },
+    /*
+    // probably don't need this because we can query by node???
     post: {
-      type: postType,
-      resolve: (_obj, { id }) => {
+      type: PostType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+      },
+      resolve: async (_obj, { id: globalId }) => {
+        const { type, id } = fromGlobalId(globalId);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         return allPosts[id];
       },
     },
+    */
+    /*
     comment: {
-      type: commentType,
-      resolve: (_obj, { id }) => {
+      type: CommentType,
+      args: {
+        id: { type: GraphQLID },
+      },
+      resolve: (_obj, { id: globalId }) => {
+        const { type, id } = fromGlobalId(globalId);
+        console.log("ayyyy", id);
         return allComments[id];
       },
     },
+    */
     node: nodeField,
   }),
 });

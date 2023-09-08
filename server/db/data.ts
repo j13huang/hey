@@ -20,15 +20,23 @@ interface Comment {
   childrenIds: Array<string>;
 }
 
-const firstPostComment: Comment = {
+const firstPostComment1: Comment = {
   id: "1",
   user: firstUser,
-  body: "yo",
+  body: "yo1",
+  childrenIds: [],
+};
+
+const firstPostComment2: Comment = {
+  id: "2",
+  user: firstUser,
+  body: "yo2",
   childrenIds: [],
 };
 
 export const allComments: { [key: string]: Comment } = {
-  [firstPostComment.id]: firstPostComment,
+  [firstPostComment1.id]: firstPostComment1,
+  [firstPostComment2.id]: firstPostComment2,
 };
 
 export function getComment(id: string): Comment | undefined {
@@ -37,24 +45,50 @@ export function getComment(id: string): Comment | undefined {
 
 interface Post {
   id: string;
-  title: String;
-  body: String;
+  title: string;
+  body: string;
+  link?: string;
   comments: Array<string>;
 }
 const firstPost: Post = {
   id: "1",
   title: "first post",
   body: "yo",
+  link: "",
   comments: ["1"],
+};
+const secondPost: Post = {
+  id: "2",
+  title: "second post",
+  body: "yo two",
+  link: "",
+  comments: [],
 };
 
 export const allPosts: { [key: string]: Post } = {
   [firstPost.id]: firstPost,
+  [secondPost.id]: secondPost,
 };
 
 export function getPost(id: string): Post | undefined {
   return allPosts[id];
 }
+
+interface Vote {
+  id: string;
+  value: number;
+  user: string;
+}
+const postVote: Vote = {
+  id: "1",
+  value: 1,
+  user: "1",
+};
+
+export const allVotes: { [key: string]: Vote } = {
+  [postVote.id]: postVote,
+};
+
 /**
  * This defines a basic set of data for our Star Wars Schema.
  *

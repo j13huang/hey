@@ -10,7 +10,12 @@ app.use(
     "/graphql",
     graphqlHTTP({
       schema: schema,
-      graphiql: process.env.NODE_ENV !== "production",
+      graphiql:
+        process.env.NODE_ENV === "production"
+          ? false
+          : {
+              editorTheme: "ambiance",
+            },
     }),
   ),
 );
