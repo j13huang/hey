@@ -4,8 +4,8 @@ import { allPosts, allComments, allUsers, allVotes } from "../../db/data";
 const { nodeInterface, nodeField } = nodeDefinitions(
   async (globalId) => {
     var { type, id } = fromGlobalId(globalId);
-    console.log("SLEEPING NODE", type, id);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    //console.log("SLEEPING NODE", type, id);
+    //await new Promise((resolve) => setTimeout(resolve, 2000));
     switch (type) {
       case "Post":
         return {

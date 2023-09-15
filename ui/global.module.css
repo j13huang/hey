@@ -17,6 +17,23 @@
   margin: 0;
 }
 
+:global(*),
+:global(*::before),
+:global(*::after) {
+  box-sizing: border-box;
+}
+
+:global(a) {
+  color: rgb(203, 203, 203);
+  text-decoration: none;
+}
+
+/*
+:global(a:hover) {
+  color: black;
+}
+*/
+
 .App {
   text-align: center;
   background-color: blue;

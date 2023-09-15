@@ -13,7 +13,6 @@ type Query {
     """Returns the last n items from the list."""
     last: Int
   ): PostConnection
-  post(id: ID!): Post
 
   """Fetches an object given its ID"""
   node(
@@ -68,6 +67,7 @@ type Post implements Node {
 
   """link (optional)"""
   link: String
+  user: User!
 
   """Comments for a post"""
   comments(
@@ -91,6 +91,15 @@ interface Node {
   id: ID!
 }
 
+"""user"""
+type User implements Node {
+  """The ID of an object"""
+  id: ID!
+
+  """name"""
+  name: String!
+}
+
 """A connection to a list of items."""
 type CommentConnection {
   """Information to aid in pagination."""
@@ -98,6 +107,14 @@ type CommentConnection {
 
   """A list of edges."""
   edges: [CommentEdge]
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  This allows a client to fetch the first five objects by passing "5" as the
+  argument to "first", then fetch the total count so it could display "5 of 83",
+  for example.
+  """
+  count: Int!
 }
 
 """An edge in a connection."""
@@ -120,18 +137,26 @@ type Comment implements Node {
   """body"""
   body: String!
 
-  """parentId, if null then it's a root level"""
-  parentId: String
+  """parent, if null then it's a root level"""
+  parent: Comment
 
-  """childrenIds"""
-  childrenIds: String!
+  """children comments"""
+  children: Comment!
 }
 
-"""user"""
-type User implements Node {
-  """The ID of an object"""
-  id: ID!
+type Mutation {
+  newPost(input: NewPostInput!): NewPostPayload
+}
 
-  """name"""
-  name: String!
+type NewPostPayload {
+  post: Post
+  allPosts: PostConnection
+  clientMutationId: String
+}
+
+input NewPostInput {
+  title: String!
+  body: String!
+  userId: String!
+  clientMutationId: String
 }

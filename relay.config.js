@@ -4,6 +4,6 @@ module.exports = {
   src: "./ui",
   language: "typescript",
   schema: "./graphql/schema.graphql",
-  //eagerEsModules: true,
+  eagerEsModules: true,
   exclude: ["**/node_modules/**", "**/__mocks__/**", "**/__generated__/**"],
-}
+};

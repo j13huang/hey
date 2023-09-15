@@ -1,0 +1,9 @@
+.HomepagePost {
+  border: 1px solid rgb(203, 203, 203);
+  border-radius: 4px;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+}

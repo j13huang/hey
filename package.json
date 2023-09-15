@@ -6,7 +6,7 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "start": "ts-node-dev --respawn --transpile-only --project tsconfig.server.json ./server/index.ts",
-    "relay": "npx relay-compiler",
+    "relay": "npx relay-compiler --watch",
     "schema": "npx tsc ./graphql/print-schema.ts --outDir ./graphql/dist && node graphql/dist/graphql/print-schema.js"
   },
   "dependencies": {
@@ -38,7 +38,7 @@
     "babel-plugin-relay": "^14.1.0",
     "graphql": "^15.8.0",
     "prettier": "^2.4.1",
-    "relay-compiler": "^14.1.0",
+    "relay-compiler": "^15.0.0",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.2",
     "vite": "^2.6.0"

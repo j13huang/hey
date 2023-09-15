@@ -1,9 +1,10 @@
-import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull } from "graphql";
+import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull, GraphQLInt } from "graphql";
 import { connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
 import { globalIdField } from "graphql-relay";
 import { nodeInterface } from "../node";
 import { CommentType } from "./comment";
-import { getComment } from "../../../db/data";
+import { UserType } from "./user";
+import { allUsers, getComment } from "../../../db/data";
 
 /**
  * We define a connection between a post and its comments.
@@ -23,6 +24,23 @@ import { getComment } from "../../../db/data";
  */
 const { connectionType: commentConnection } = connectionDefinitions({
   nodeType: CommentType,
+  connectionFields: () => ({
+    count: {
+      type: GraphQLNonNull(GraphQLInt),
+      description: `A count of the total number of objects in this connection, ignoring pagination.
+This allows a client to fetch the first five objects by passing "5" as the
+argument to "first", then fetch the total count so it could display "5 of 83",
+for example.`,
+      resolve: (connection) => {
+        console.log("connection", connection);
+        return connection.length;
+      },
+    },
+  }),
+});
+
+const { connectionType: userConnection } = connectionDefinitions({
+  nodeType: UserType,
 });
 
 /**
@@ -45,11 +63,27 @@ export const PostType = new GraphQLObjectType({
     title: { type: GraphQLNonNull(GraphQLString), description: "title" },
     body: { type: GraphQLNonNull(GraphQLString), description: "body" },
     link: { type: GraphQLString, description: "link (optional)" },
+    user: { type: GraphQLNonNull(UserType) },
+    /*
+    user: {
+      type: userConnection,
+      description: "user that posted this post",
+      args: connectionArgs,
+      resolve: (post, args) => {
+        return connectionFromArray([allUsers[post.userId]], args);
+      },
+    },
+    */
     comments: {
       type: commentConnection,
       description: "Comments for a post",
       args: connectionArgs,
-      resolve: (post, args) => connectionFromArray(post.comments.map(getComment), args),
+      resolve: (post, args) => {
+        //console.log("resolving comments on post");
+        return connectionFromArray(post.comments.map(getComment), {
+          ...args,
+        });
+      },
     },
   }),
   /*

@@ -16,23 +16,26 @@ interface Comment {
   id: string;
   user: User;
   body: string;
-  parentId?: string;
-  childrenIds: Array<string>;
+  parent?: Comment;
+  children: Array<Comment>;
 }
 
 const firstPostComment1: Comment = {
   id: "1",
   user: firstUser,
   body: "yo1",
-  childrenIds: [],
+  children: [],
 };
 
 const firstPostComment2: Comment = {
   id: "2",
   user: firstUser,
   body: "yo2",
-  childrenIds: [],
+  parent: firstPostComment1,
+  children: [],
 };
+
+firstPostComment1.children = [firstPostComment2];
 
 export const allComments: { [key: string]: Comment } = {
   [firstPostComment1.id]: firstPostComment1,
@@ -48,6 +51,7 @@ interface Post {
   title: string;
   body: string;
   link?: string;
+  user: User;
   comments: Array<string>;
 }
 const firstPost: Post = {
@@ -55,6 +59,7 @@ const firstPost: Post = {
   title: "first post",
   body: "yo",
   link: "",
+  user: firstUser,
   comments: ["1"],
 };
 const secondPost: Post = {
@@ -62,12 +67,28 @@ const secondPost: Post = {
   title: "second post",
   body: "yo two",
   link: "",
+  user: firstUser,
   comments: [],
 };
 
 export const allPosts: { [key: string]: Post } = {
   [firstPost.id]: firstPost,
   [secondPost.id]: secondPost,
+};
+
+export const newPost = (title, body, userId) => {
+  const posts = Object.values(allPosts);
+  const largestId = parseInt(posts[posts.length - 1].id);
+  const post = {
+    id: `${largestId + 1}`,
+    title,
+    body,
+    link: "",
+    user: allUsers[userId],
+    comments: [],
+  };
+  allPosts[post.id] = post;
+  return post;
 };
 
 export function getPost(id: string): Post | undefined {

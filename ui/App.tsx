@@ -9,6 +9,7 @@ import { Layout } from "./components/Layout";
 import { Homepage, AllPostsQuery } from "./components/Homepage";
 import { HomepageAllPostsQuery as AllPostsQueryType } from "./components/Homepage/__generated__/HomepageAllPostsQuery.graphql";
 import { Post, PostQuery } from "./components/Post";
+import { NewPost } from "./components/NewPost";
 import { PostQuery as PostQueryType } from "./components/Post/__generated__/PostQuery.graphql";
 
 import "./global.module.css";
@@ -53,6 +54,10 @@ const router = createBrowserRouter(
               <Post />
             </Suspense>
           ),
+        },
+        {
+          path: "post/new",
+          element: <NewPost />,
         },
       ],
     },

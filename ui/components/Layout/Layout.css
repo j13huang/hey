@@ -1,0 +1,18 @@
+.Layout--header {
+  padding: 16px;
+  border-bottom: 1px solid rgb(203, 203, 203);
+  display: flex;
+  justify-content: space-between;
+}
+
+.Layout--headerItemsLeft {
+  display: flex;
+}
+
+.Layout--headerItemsRight {
+  display: flex;
+}
+
+.Layout {
+  margin-top: 32px;
+}

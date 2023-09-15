@@ -11,10 +11,13 @@ import "./Post.css";
 export const PostQuery = graphql`
   query PostQuery($postID: ID!) {
     node(id: $postID) {
-      id
       ... on Post {
+        id
         title
         body
+        user {
+          name
+        }
         comments {
           edges {
             cursor
@@ -41,8 +44,8 @@ export const Post: React.FC<any> = (props) => {
         <div className="Post">
           <p>{JSON.stringify(post)}</p>
           <h4>{post.title}</h4>
-          <p>{post.title}</p>
-          <p>this is a post</p>
+          <p>{post.body}</p>
+          <p>posted by {post.user?.name ? post.user!.name : "anonymous"}</p>
         </div>
       </div>
       <div className="Post--comments">
