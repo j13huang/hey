@@ -5,10 +5,11 @@ import {
   connectionArgs,
   connectionFromArray,
   mutationWithClientMutationId,
+  cursorToOffset,
 } from "graphql-relay";
 import { PostType } from "./types/post";
-import { CommentType } from "./types/comment";
-import { allPosts, allComments, newPost } from "../../db/data";
+import { CommentType, CommentConnectionType } from "./types/comment";
+import { allPosts, allComments, newPost, newComment } from "../../db/data";
 import { nodeField } from "./node";
 
 const { connectionType: PostConnection } = connectionDefinitions({
@@ -36,7 +37,9 @@ const queryType = new GraphQLObjectType({
       resolve: async (_obj, args) => {
         //console.log("SLEEPING", allPosts);
         //await new Promise((resolve) => setTimeout(resolve, 2000));
-        //console.log("allPosts", _obj, args);
+        //let { type, id } = fromGlobalId(args.after || "");
+        //console.log("eh", type, id);
+        console.log("allPosts", _obj, args, args.after ? cursorToOffset(args.after) : "");
         return connectionFromArray(Object.values(allPosts).reverse(), args);
       },
     },
@@ -83,28 +86,76 @@ const mutationType = new GraphQLObjectType({
         body: {
           type: new GraphQLNonNull(GraphQLString),
         },
-        userId: {
-          type: new GraphQLNonNull(GraphQLString),
-        },
       },
       outputFields: {
         post: {
           type: PostType,
-          resolve: (payload) => allPosts[payload.id],
+          //resolve: (payload) => allPosts[payload.id],
         },
         allPosts: {
           type: PostConnection,
           resolve: (payload, args, ctx, info) => {
             console.log("mutate allPosts", payload, args);
+            // 'YXJyYXljb25uZWN0aW9uOjA='
+            console.log(connectionFromArray(Object.values(allPosts).reverse(), {}));
+            console.log(connectionFromArray(Object.values(allPosts).reverse(), { after: "YXJyYXljb25uZWN0aW9uOjA=" }));
             return connectionFromArray(Object.values(allPosts).reverse(), {});
+            //return connectionFromArray(Object.values([allPosts[payload.id]]), {});
           },
         },
       },
-      mutateAndGetPayload: ({ title, body, userId }, ctx, info) => {
-        console.log(ctx, info);
+      mutateAndGetPayload: ({ title, body }, ctx, info) => {
+        //console.log("mutateandget newpost", ctx, info);
+        // get userId from login context
+        let userId = "1";
         const post = newPost(title, body, userId);
         return {
           ...post,
+        };
+      },
+    }),
+    newComment: mutationWithClientMutationId({
+      name: "NewComment",
+      inputFields: {
+        // either postId or parentId is provided
+        postId: {
+          type: GraphQLString,
+        },
+        parentId: {
+          type: GraphQLString,
+        },
+        body: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+      },
+      outputFields: {
+        comment: {
+          type: PostType,
+          resolve: (payload) => allComments[payload.postId],
+        },
+        commentsEdge: {
+          type: CommentConnectionType,
+          resolve: (payload) => {
+            if (payload.postId) {
+              return connectionFromArray(
+                allPosts[payload.postId].commentIds.map((id) => allComments[id]),
+                {},
+              );
+            }
+
+            return connectionFromArray(
+              allComments[payload.parentId].children.map((id) => allComments[id]),
+              {},
+            );
+          },
+        },
+      },
+      mutateAndGetPayload: ({ postId, parentId, body }, ctx, info) => {
+        console.log(ctx, info);
+        // get userId from login context
+        const comment = newComment(postId, parentId, body, null);
+        return {
+          ...comment,
         };
       },
     }),

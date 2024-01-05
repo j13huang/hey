@@ -2,6 +2,8 @@
   /*
   display: inline-block;
   */
+  margin: 8px;
+  margin-left: 24px;
 }
 
 .Post--body {
@@ -10,9 +12,5 @@
 
   border: 1px solid rgb(203, 203, 203);
   border-radius: 4px;
-  margin: 8px;
   padding: 24px;
-}
-
-.Post--comments {
 }

@@ -70,7 +70,7 @@ type Post implements Node {
   user: User!
 
   """Comments for a post"""
-  comments(
+  commentTree(
     """Returns the items in the list that come after the specified cursor."""
     after: String
 
@@ -114,7 +114,7 @@ type CommentConnection {
   argument to "first", then fetch the total count so it could display "5 of 83",
   for example.
   """
-  count: Int!
+  childrenCount: Int!
 }
 
 """An edge in a connection."""
@@ -137,15 +137,31 @@ type Comment implements Node {
   """body"""
   body: String!
 
+  """associated post"""
+  post: Post!
+
   """parent, if null then it's a root level"""
   parent: Comment
 
   """children comments"""
-  children: Comment!
+  children(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): CommentConnection
 }
 
 type Mutation {
   newPost(input: NewPostInput!): NewPostPayload
+  newComment(input: NewCommentInput!): NewCommentPayload
 }
 
 type NewPostPayload {
@@ -157,6 +173,18 @@ type NewPostPayload {
 input NewPostInput {
   title: String!
   body: String!
-  userId: String!
+  clientMutationId: String
+}
+
+type NewCommentPayload {
+  comment: Post
+  commentsEdge: CommentConnection
+  clientMutationId: String
+}
+
+input NewCommentInput {
+  postId: String
+  parentId: String
+  body: String!
   clientMutationId: String
 }

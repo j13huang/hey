@@ -17,7 +17,7 @@ export const VoteType = new GraphQLObjectType({
   interfaces: [nodeInterface],
   fields: () => ({
     id: globalIdField(),
-    value: { type: GraphQLNonNull(GraphQLInt), description: "vote value (1 or -1)" },
+    value: { type: GraphQLNonNull(GraphQLInt), description: "vote value (-1, 0 or 1)" },
   }),
   //isTypeOf: (obj) => obj instanceof UserType,
 });

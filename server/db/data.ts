@@ -1,3 +1,5 @@
+import * as crypto from "crypto";
+
 interface User {
   id: string;
   name: string;
@@ -16,14 +18,34 @@ interface Comment {
   id: string;
   user: User;
   body: string;
-  parent?: Comment;
-  children: Array<Comment>;
+  postId: string;
+  parentId?: string;
+  children: Array<string>;
 }
 
 const firstPostComment1: Comment = {
   id: "1",
   user: firstUser,
   body: "yo1",
+  postId: "1",
+  children: ["1-1"],
+};
+
+const firstPostComment1Reply1: Comment = {
+  id: "1-1",
+  user: firstUser,
+  body: "yo1-reply1",
+  postId: "1",
+  parentId: "1",
+  children: ["1-1-1"],
+};
+
+const firstPostComment1Reply1Reply1: Comment = {
+  id: "1-1-1",
+  user: firstUser,
+  body: "yo1-reply1-reply1",
+  postId: "1",
+  parentId: "1-1",
   children: [],
 };
 
@@ -31,20 +53,58 @@ const firstPostComment2: Comment = {
   id: "2",
   user: firstUser,
   body: "yo2",
-  parent: firstPostComment1,
+  postId: "1",
+  children: ["2-1"],
+};
+
+const firstPostComment2Reply1: Comment = {
+  id: "2-1",
+  user: firstUser,
+  body: "yo2-reply1",
+  postId: "1",
+  parentId: "2",
   children: [],
 };
 
-firstPostComment1.children = [firstPostComment2];
+const firstPostComment3: Comment = {
+  id: "3",
+  user: firstUser,
+  postId: "1",
+  body: "yo3",
+  children: [],
+};
+
+const secondPostComment1: Comment = {
+  id: "second1",
+  user: firstUser,
+  postId: "2",
+  body: "yo second post comment here",
+  children: [],
+};
 
 export const allComments: { [key: string]: Comment } = {
   [firstPostComment1.id]: firstPostComment1,
+  [firstPostComment1Reply1.id]: firstPostComment1Reply1,
+  [firstPostComment1Reply1Reply1.id]: firstPostComment1Reply1Reply1,
   [firstPostComment2.id]: firstPostComment2,
+  [firstPostComment2Reply1.id]: firstPostComment2Reply1,
+  [firstPostComment3.id]: firstPostComment3,
+  [secondPostComment1.id]: secondPostComment1,
 };
 
-export function getComment(id: string): Comment | undefined {
-  return allComments[id];
-}
+export const newComment = (postId, parentId, body, userId) => {
+  let hash = crypto.createHash("md5").update(body).digest("hex");
+  const comment = {
+    id: `${postId}-${parentId || "root"}-${hash.slice(0, 6)}`,
+    postId,
+    parentId,
+    body,
+    user: allUsers[userId],
+    children: [],
+  };
+  allComments[comment.id] = comment;
+  return comment;
+};
 
 interface Post {
   id: string;
@@ -52,7 +112,7 @@ interface Post {
   body: string;
   link?: string;
   user: User;
-  comments: Array<string>;
+  commentIds: Array<string>;
 }
 const firstPost: Post = {
   id: "1",
@@ -60,7 +120,7 @@ const firstPost: Post = {
   body: "yo",
   link: "",
   user: firstUser,
-  comments: ["1"],
+  commentIds: ["1", "2"],
 };
 const secondPost: Post = {
   id: "2",
@@ -68,7 +128,7 @@ const secondPost: Post = {
   body: "yo two",
   link: "",
   user: firstUser,
-  comments: [],
+  commentIds: [],
 };
 
 export const allPosts: { [key: string]: Post } = {
@@ -85,15 +145,11 @@ export const newPost = (title, body, userId) => {
     body,
     link: "",
     user: allUsers[userId],
-    comments: [],
+    commentIds: [],
   };
   allPosts[post.id] = post;
   return post;
 };
-
-export function getPost(id: string): Post | undefined {
-  return allPosts[id];
-}
 
 interface Vote {
   id: string;

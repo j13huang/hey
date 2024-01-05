@@ -27,7 +27,8 @@ type Props = {
 
 export const HomepagePosts: React.FC<Props> = ({ allPosts }) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment(HomepagePostsFragment, allPosts);
-  console.log(data!.allPosts!.__id);
+  //console.log(data!.allPosts!.__id);
+  //console.log(data);
 
   return (
     <div className="HomepagePosts">

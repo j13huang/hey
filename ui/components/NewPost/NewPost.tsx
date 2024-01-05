@@ -5,8 +5,10 @@ import { NewPostMutation as NewPostMutationType } from "./__generated__/NewPostM
 import { HomepagePostFragment } from "../Homepage/HomepagePost";
 
 import "./NewPost.css";
+import { ReadOnlyRecordProxy } from "relay-runtime";
 
 // not sure if this is relevant if i use a fragment https://github.com/facebook/relay/issues/2250
+// actually i think i should use @inline if i use a fragment
 const NewPostMutation = graphql`
   mutation NewPostMutation($input: NewPostInput!, $connections: [ID!]!) {
     newPost(input: $input) {
@@ -15,6 +17,7 @@ const NewPostMutation = graphql`
       }
       allPosts {
         edges @prependEdge(connections: $connections) {
+          cursor
           node {
             id
           }
@@ -67,14 +70,35 @@ export const NewPost: React.FC<Props> = (props) => {
                 input: {
                   title,
                   body,
-                  userId: "1",
                 },
                 connections: [connectionID],
               },
+              /* updater: (store, { newPost }) => {
+                console.log("updater", newPost);
+                const query = store.getRoot() as ReadOnlyRecordProxy;
+                console.log(query);
+                const connectionRecord = ConnectionHandler.getConnection(
+                  query,
+                  "HomepagePostsFragment_allPosts",
+                  //{first: 1, after: null}
+                );
+                console.log(connectionRecord);
+                /*
+              
+                const newComment = (...);
+                const newEdge = (...);
+              
+                ConnectionHandler.insertEdgeAfter(
+                  connectionRecordSortedByDate,
+                  newEdge,
+                );
+                return b;
+                */
+              //},
               onCompleted: ({ newPost }) => {
                 //const post = readInlineData(HomepagePostFragment, newPost!.post);
                 //const post = useFragment(HomepagePostFragment, newPost!.post);
-                //console.log(newPost);
+                //console.log("onComplete new post", newPost);
                 navigate(`/post/${newPost!.post!.id}`);
                 //navigate(`/`);
               },

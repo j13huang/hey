@@ -33,7 +33,7 @@ const router = createBrowserRouter(
             };
           },
           element: (
-            <Suspense fallback="Loading Homepage...">
+            <Suspense fallback={<div>Loading Homepage...</div>}>
               <Homepage />
             </Suspense>
           ),
