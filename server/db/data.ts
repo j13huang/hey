@@ -19,69 +19,79 @@ interface Comment {
   user: User;
   body: string;
   postId: string;
+  // parent ids set automatically via code below
   parentId?: string;
+  depth: number;
   children: Array<string>;
 }
 
-const firstPostComment1: Comment = {
-  id: "1",
-  user: firstUser,
-  body: "yo1",
-  postId: "1",
-  children: ["1-1"],
-};
-
-const firstPostComment1Reply1: Comment = {
-  id: "1-1",
-  user: firstUser,
-  body: "yo1-reply1",
-  postId: "1",
-  parentId: "1",
-  children: ["1-1-1"],
-};
-
 const firstPostComment1Reply1Reply1: Comment = {
-  id: "1-1-1",
+  id: "1.1-1-1",
   user: firstUser,
   body: "yo1-reply1-reply1",
   postId: "1",
-  parentId: "1-1",
+  //parentId: firstPostComment1Reply1.id,
+  depth: 2,
+  children: [],
+};
+
+const firstPostComment1Reply1: Comment = {
+  id: "1.1-1",
+  user: firstUser,
+  body: "yo1-reply1",
+  postId: "1",
+  //parentId: firstPostComment1.id,
+  depth: 1,
+  children: [firstPostComment1Reply1Reply1.id],
+};
+
+const firstPostComment1: Comment = {
+  id: "1.1",
+  user: firstUser,
+  body: "yo1",
+  postId: "1",
+  depth: 0,
+  children: [firstPostComment1Reply1.id],
+};
+
+const firstPostComment2Reply1: Comment = {
+  id: "1.2-1",
+  user: firstUser,
+  body: "yo2-reply1",
+  postId: "1",
+  //parentId: firstPostComment2.id,
+  depth: 1,
   children: [],
 };
 
 const firstPostComment2: Comment = {
-  id: "2",
+  id: "1.2",
   user: firstUser,
   body: "yo2",
   postId: "1",
-  children: ["2-1"],
-};
-
-const firstPostComment2Reply1: Comment = {
-  id: "2-1",
-  user: firstUser,
-  body: "yo2-reply1",
-  postId: "1",
-  parentId: "2",
-  children: [],
+  depth: 0,
+  children: [firstPostComment2Reply1.id],
 };
 
 const firstPostComment3: Comment = {
-  id: "3",
+  id: "1.3",
   user: firstUser,
   postId: "1",
   body: "yo3",
+  depth: 0,
   children: [],
 };
 
 const secondPostComment1: Comment = {
-  id: "second1",
+  id: "2.1",
   user: firstUser,
   postId: "2",
   body: "yo second post comment here",
+  depth: 0,
   children: [],
 };
 
+// https://stackoverflow.com/a/23202095
 export const allComments: { [key: string]: Comment } = {
   [firstPostComment1.id]: firstPostComment1,
   [firstPostComment1Reply1.id]: firstPostComment1Reply1,
@@ -91,6 +101,14 @@ export const allComments: { [key: string]: Comment } = {
   [firstPostComment3.id]: firstPostComment3,
   [secondPostComment1.id]: secondPostComment1,
 };
+//console.log(Object.keys(allComments));
+// set parents
+Object.values(allComments).forEach((comment) => {
+  comment.children.forEach((cId) => {
+    let child = allComments[cId];
+    child.parentId = comment.id;
+  });
+});
 
 export const newComment = (postId, parentId, body, userId) => {
   let hash = crypto.createHash("md5").update(body).digest("hex");
@@ -100,6 +118,7 @@ export const newComment = (postId, parentId, body, userId) => {
     parentId,
     body,
     user: allUsers[userId],
+    depth: allComments[parentId] ? allComments[parentId].depth + 1 : 0,
     children: [],
   };
   allComments[comment.id] = comment;
@@ -112,6 +131,7 @@ interface Post {
   body: string;
   link?: string;
   user: User;
+  childCommentIds: Array<string>;
   commentIds: Array<string>;
 }
 const firstPost: Post = {
@@ -120,7 +140,12 @@ const firstPost: Post = {
   body: "yo",
   link: "",
   user: firstUser,
-  commentIds: ["1", "2"],
+  childCommentIds: Object.values(allComments)
+    .filter((c) => c.postId === "1" && c.depth === 0)
+    .map((c) => c.id),
+  commentIds: Object.values(allComments)
+    .filter((c) => c.postId === "1")
+    .map((c) => c.id),
 };
 const secondPost: Post = {
   id: "2",
@@ -128,12 +153,28 @@ const secondPost: Post = {
   body: "yo two",
   link: "",
   user: firstUser,
+  childCommentIds: Object.values(allComments)
+    .filter((c) => c.postId === "2" && c.depth === 0)
+    .map((c) => c.id),
+  commentIds: Object.values(allComments)
+    .filter((c) => c.postId === "2")
+    .map((c) => c.id),
+};
+
+const thirdPost: Post = {
+  id: "3",
+  title: "third post",
+  body: "yo three",
+  link: "",
+  user: firstUser,
+  childCommentIds: [],
   commentIds: [],
 };
 
 export const allPosts: { [key: string]: Post } = {
   [firstPost.id]: firstPost,
   [secondPost.id]: secondPost,
+  [thirdPost.id]: thirdPost,
 };
 
 export const newPost = (title, body, userId) => {
@@ -145,6 +186,7 @@ export const newPost = (title, body, userId) => {
     body,
     link: "",
     user: allUsers[userId],
+    childCommentIds: [],
     commentIds: [],
   };
   allPosts[post.id] = post;

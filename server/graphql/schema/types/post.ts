@@ -41,14 +41,30 @@ export const PostType = new GraphQLObjectType({
       },
     },
     */
-    commentTree: {
-      type: CommentConnectionType,
+    comments: {
+      type: GraphQLNonNull(CommentConnectionType),
       description: "Comments for a post",
       args: connectionArgs,
       resolve: (post, args) => {
-        //console.log("resolving comments on post");
+        console.log("resolving comments on post");
         return connectionFromArray(
           post.commentIds.map((commentId) => {
+            return allComments[commentId];
+          }),
+          {
+            ...args,
+          },
+        );
+      },
+    },
+    commentTree: {
+      type: GraphQLNonNull(CommentConnectionType),
+      description: "Comments for a post",
+      args: connectionArgs,
+      resolve: (post, args) => {
+        console.log("resolving comment tree on post");
+        return connectionFromArray(
+          post.childCommentIds.map((commentId) => {
             return allComments[commentId];
           }),
           {

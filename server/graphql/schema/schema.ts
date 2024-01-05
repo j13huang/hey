@@ -90,7 +90,7 @@ const mutationType = new GraphQLObjectType({
       outputFields: {
         post: {
           type: PostType,
-          //resolve: (payload) => allPosts[payload.id],
+          resolve: (payload) => allPosts[payload.id],
         },
         allPosts: {
           type: PostConnection,
@@ -131,20 +131,20 @@ const mutationType = new GraphQLObjectType({
       outputFields: {
         comment: {
           type: PostType,
-          resolve: (payload) => allComments[payload.postId],
+          resolve: (payload) => allComments[payload.id],
         },
         commentsEdge: {
           type: CommentConnectionType,
           resolve: (payload) => {
-            if (payload.postId) {
+            if (payload.parentId) {
               return connectionFromArray(
-                allPosts[payload.postId].commentIds.map((id) => allComments[id]),
+                allComments[payload.parentId].children.map((id) => allComments[id]),
                 {},
               );
             }
 
             return connectionFromArray(
-              allComments[payload.parentId].children.map((id) => allComments[id]),
+              allPosts[payload.postId].childCommentIds.map((id) => allComments[id]),
               {},
             );
           },

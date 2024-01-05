@@ -12,6 +12,7 @@ export const CommentFragment = graphql`
     parent {
       id
     }
+    depth
     user {
       name
     }
@@ -20,38 +21,35 @@ export const CommentFragment = graphql`
 
 type Props = {
   className?: string;
-  first?: boolean;
-  commentTree: CommentFragment$key;
+  comment: CommentFragment$key;
+  isCollapsed?: boolean;
+  onShowHideClick: () => void;
 };
 
-export const Comment: React.FC<Props> = ({ className, first, commentTree }) => {
-  const [isVisible, setIsVisible] = useState(true);
-  const data = useFragment(CommentFragment, commentTree);
-  //console.log(data, commentTree);
+export const Comment: React.FC<Props> = ({ className, comment, isCollapsed, onShowHideClick }) => {
+  const data = useFragment(CommentFragment, comment);
+  //console.log(data);
 
   return (
-    <ul className={clsx("Comment", first && "Comment--topLevel", className)}>
+    <ul className={clsx("Comment", className)}>
       <li>
+        <div>{new Array(data.depth).fill(0).map(() => "-")}</div>
         <div className="Comment--container">
           <span
             className="Comment--collapseButton"
             onClick={() => {
-              setIsVisible(!isVisible);
+              onShowHideClick();
             }}
           >
-            {/* en-dash */}[{isVisible ? "–" : "+"}]
+            {/* en-dash */}[{isCollapsed ? "+" : "-"}]
           </span>
           <div>
             <div>
               {data.user.name} parent {data.parent?.id || "<no parent id>"}
             </div>
-            <div>{isVisible && <p>{data.body}</p>}</div>
+            <div>{!isCollapsed && <p>{data.body}</p>}</div>
           </div>
         </div>
-        {isVisible &&
-          ((commentTree as any).children?.edges || []).map((e: any, i: number) => {
-            return <Comment key={i} commentTree={e.node} />;
-          })}
       </li>
     </ul>
   );

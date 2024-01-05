@@ -5,6 +5,7 @@ import RelayEnvironment from "../../lib/graphql/RelayEnvironment";
 import { PostQuery as PostQueryType } from "./__generated__/PostQuery.graphql";
 
 import { CommentTree } from "../Comment/CommentTree";
+import { Comments } from "../Comment/Comments";
 
 import "./Post.css";
 
@@ -18,7 +19,7 @@ export const PostQuery = graphql`
         user {
           name
         }
-        ...CommentTreeFragment
+        ...CommentsFragment
       }
     }
   }
@@ -41,7 +42,10 @@ export const Post: React.FC<any> = (props) => {
           <p>posted by {post.user?.name ? post.user!.name : "anonymous"}</p>
         </div>
       </div>
+      {/*
       <CommentTree post={post} />
+  */}
+      <Comments post={post} />
     </div>
   );
 };

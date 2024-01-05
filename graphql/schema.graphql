@@ -70,6 +70,21 @@ type Post implements Node {
   user: User!
 
   """Comments for a post"""
+  comments(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): CommentConnection
+
+  """Comments for a post"""
   commentTree(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -142,6 +157,7 @@ type Comment implements Node {
 
   """parent, if null then it's a root level"""
   parent: Comment
+  depth: Int!
 
   """children comments"""
   children(

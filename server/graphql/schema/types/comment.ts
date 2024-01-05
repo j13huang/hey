@@ -20,23 +20,26 @@ export const CommentType = new GraphQLObjectType({
     post: {
       type: GraphQLNonNull(PostType),
       description: "associated post",
-      resolve: (a, b) => {
-        console.log(a, b);
-        return getNode("Post", a.parentId);
+      resolve: (comment, args) => {
+        console.log(comment, args);
+        return getNode("Post", comment.postId);
       },
     },
     // can i set a default resolver for this to look up by node?
     parent: {
       type: CommentType,
       description: "parent, if null then it's a root level",
-      resolve: (a, b) => {
-        console.log(a, b);
-        return a.parentId ? getNode("Comment", a.parentId) : null;
+      resolve: (comment, args) => {
+        console.log("comment parent", comment, getNode("Comment", comment.parentId));
+        return comment.parentId ? getNode("Comment", comment.parentId) : null;
       },
+    },
+    depth: {
+      type: GraphQLNonNull(GraphQLInt),
     },
     //children: { type: GraphQLNonNull(commentConnection), description: "children comments" },
     children: {
-      type: CommentConnectionType,
+      type: GraphQLNonNull(CommentConnectionType),
       description: "children comments",
       args: connectionArgs,
       resolve: (comment, args) => {

@@ -5,7 +5,7 @@ import { HomepagePostsFragment$key } from "./__generated__/HomepagePostsFragment
 
 export const HomepagePostsFragment = graphql`
   fragment HomepagePostsFragment on Query
-  @argumentDefinitions(cursor: { type: "String" }, count: { type: "Int", defaultValue: 1 })
+  @argumentDefinitions(cursor: { type: "String" }, count: { type: "Int", defaultValue: 2 })
   @refetchable(queryName: "HomepagePostsPaginationQuery") {
     allPosts(after: $cursor, first: $count) @connection(key: "HomepagePostsFragment_allPosts") {
       __id
