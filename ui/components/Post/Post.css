@@ -1,4 +1,4 @@
-.Post {
+.Post--container {
   /*
   display: inline-block;
   */
@@ -6,11 +6,22 @@
   margin-left: 24px;
 }
 
-.Post--body {
-  display: flex;
-  justify-content: flex-start;
+.Post {
+  margin-bottom: 16px;
+}
 
+.Post--header {
+  margin-bottom: 16px;
+}
+
+.Post--body {
   border: 1px solid rgb(203, 203, 203);
   border-radius: 4px;
   padding: 24px;
+}
+
+.Post--actionBar {
+  display: flex;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }

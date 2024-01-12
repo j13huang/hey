@@ -8,9 +8,9 @@ import { NewComment } from "./NewComment";
 
 import "./Comments.css";
 
-export const CommentsFragment = graphql`
+const CommentsFragment = graphql`
   fragment CommentsFragment on Post
-  @argumentDefinitions(cursor: { type: "String" }, count: { type: "Int", defaultValue: 100 })
+  @argumentDefinitions(cursor: { type: "String" }, count: { type: "Int", defaultValue: 1 })
   @refetchable(queryName: "CommentsPaginationQuery") {
     comments(after: $cursor, first: $count) @connection(key: "CommentsFragment_comments") {
       edges {
@@ -27,10 +27,12 @@ export const CommentsFragment = graphql`
 
 type Props = {
   className?: string;
-  post: CommentsFragment$key;
+  postContainer: CommentsFragment$key;
+  postId: string;
 };
 
 function renderComments(
+  postId: string,
   edges: readonly any[],
   collapsedComments: { [key: string]: boolean },
   setCollapsedComments: (value: { [key: string]: boolean }) => void,
@@ -53,7 +55,8 @@ function renderComments(
     components.push(
       <Comment
         key={i}
-        comment={comment}
+        postId={postId}
+        commentContainer={comment}
         isCollapsed={collapsedComments[comment.id]}
         onShowHideClick={() => {
           setCollapsedComments({
@@ -68,20 +71,23 @@ function renderComments(
   return components;
 }
 
-export const Comments: React.FC<Props> = ({ className, post }) => {
-  const { data, loadNext, hasNext, isLoadingNext, refetch } = usePaginationFragment(CommentsFragment, post);
-  //console.log(data.comments?.edges);
+export const Comments: React.FC<Props> = ({ className, postContainer, postId }) => {
+  const { data, loadNext, hasNext, isLoadingNext, refetch } = usePaginationFragment(CommentsFragment, postContainer);
+  console.log(data.comments?.edges);
   const [collapsedComments, setCollapsedComments] = useState<{ [key: string]: boolean }>({});
 
   return (
     <div>
       <NewComment
-        className={"CommentTree--NewComment"}
-        onPost={() => {
+        className={"Comments--NewComment"}
+        postId={postId}
+        onPost={(cursor) => {
           //refetch({});
+          // does this cursor even do anything
+          //refetch({ after: cursor });
         }}
       />
-      {renderComments(data?.comments?.edges || [], collapsedComments, setCollapsedComments)}
+      {renderComments(postId, data?.comments?.edges || [], collapsedComments, setCollapsedComments)}
       {/*(data?.comments?.edges || []).map((e, i) => {
         return (
           <Comment

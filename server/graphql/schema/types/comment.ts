@@ -17,6 +17,9 @@ export const CommentType = new GraphQLObjectType({
     id: globalIdField(),
     user: { type: GraphQLNonNull(UserType), description: "user" },
     body: { type: GraphQLNonNull(GraphQLString), description: "body" },
+    createdAtMs: {
+      type: GraphQLNonNull(GraphQLInt),
+    },
     post: {
       type: GraphQLNonNull(PostType),
       description: "associated post",
@@ -30,7 +33,7 @@ export const CommentType = new GraphQLObjectType({
       type: CommentType,
       description: "parent, if null then it's a root level",
       resolve: (comment, args) => {
-        console.log("comment parent", comment, getNode("Comment", comment.parentId));
+        //console.log("resolving parent on comment", comment, getNode("Comment", comment.parentId));
         return comment.parentId ? getNode("Comment", comment.parentId) : null;
       },
     },
@@ -73,17 +76,16 @@ export const CommentType = new GraphQLObjectType({
  *   }
  */
 
-export const { connectionType: CommentConnectionType } = connectionDefinitions({
+export const { connectionType: CommentConnectionType, edgeType: CommentEdgeType } = connectionDefinitions({
   nodeType: CommentType,
   connectionFields: () => ({
-    childrenCount: {
+    commentCount: {
       type: GraphQLNonNull(GraphQLInt),
       description: `A count of the total number of objects in this connection, ignoring pagination.
 This allows a client to fetch the first five objects by passing "5" as the
 argument to "first", then fetch the total count so it could display "5 of 83",
 for example.`,
       resolve: (connection) => {
-        //console.log("comment connection???", connection);
         return connection.edges.length;
       },
     },

@@ -5,7 +5,6 @@ import { NewPostMutation as NewPostMutationType } from "./__generated__/NewPostM
 import { HomepagePostFragment } from "../Homepage/HomepagePost";
 
 import "./NewPost.css";
-import { ReadOnlyRecordProxy } from "relay-runtime";
 
 // not sure if this is relevant if i use a fragment https://github.com/facebook/relay/issues/2250
 // actually i think i should use @inline if i use a fragment
@@ -15,12 +14,11 @@ const NewPostMutation = graphql`
       post {
         id
       }
-      allPosts {
-        edges @prependEdge(connections: $connections) {
-          cursor
-          node {
-            id
-          }
+      postEdge @prependEdge(connections: $connections) {
+        cursor
+        node {
+          id
+          ...PostFragment
         }
       }
     }

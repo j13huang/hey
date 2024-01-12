@@ -4,7 +4,6 @@ import { CommentTreeFragment$key } from "./__generated__/CommentTreeFragment.gra
 import { clsx } from "clsx";
 
 import { Comment } from "./CommentNode";
-import { NewComment } from "./NewComment";
 
 import "./CommentTree.css";
 
@@ -51,12 +50,15 @@ export const CommentTree: React.FC<Props> = ({ className, post }) => {
 
   return (
     <div>
+      {/*
+      doesn't work with comment tree for now
       <NewComment
         className={"CommentTree--NewComment"}
         onPost={() => {
           refetch({});
         }}
       />
+      */}
       {JSON.stringify(data)}
       {isVisible && (
         <>

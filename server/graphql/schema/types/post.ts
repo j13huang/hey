@@ -3,12 +3,9 @@ import { connectionDefinitions, connectionArgs, connectionFromArray } from "grap
 import { globalIdField } from "graphql-relay";
 import { nodeInterface, getNode } from "../node";
 import { CommentConnectionType } from "./comment";
+import { VoteConnectionType } from "./vote";
 import { UserType } from "./user";
 import { allUsers, allComments } from "../../../db/data";
-
-const { connectionType: UserConnectionType } = connectionDefinitions({
-  nodeType: UserType,
-});
 
 /**
  * We define our post type, which implements the node interface.
@@ -30,6 +27,9 @@ export const PostType = new GraphQLObjectType({
     title: { type: GraphQLNonNull(GraphQLString), description: "title" },
     body: { type: GraphQLNonNull(GraphQLString), description: "body" },
     link: { type: GraphQLString, description: "link (optional)" },
+    createdAtMs: {
+      type: GraphQLNonNull(GraphQLInt),
+    },
     user: { type: GraphQLNonNull(UserType) },
     /*
     user: {
@@ -41,20 +41,21 @@ export const PostType = new GraphQLObjectType({
       },
     },
     */
+    votes: {
+      type: GraphQLNonNull(VoteConnectionType),
+    },
     comments: {
       type: GraphQLNonNull(CommentConnectionType),
       description: "Comments for a post",
       args: connectionArgs,
       resolve: (post, args) => {
-        console.log("resolving comments on post");
-        return connectionFromArray(
-          post.commentIds.map((commentId) => {
-            return allComments[commentId];
-          }),
-          {
-            ...args,
-          },
-        );
+        let comments = post.commentIds.map((commentId) => {
+          return allComments[commentId];
+        });
+        //console.log("resolving comments on post", comments);
+        return connectionFromArray(comments, {
+          ...args,
+        });
       },
     },
     commentTree: {

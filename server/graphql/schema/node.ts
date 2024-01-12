@@ -9,7 +9,7 @@ const { nodeInterface, nodeField } = nodeDefinitions(
     return getNode(type, id);
   },
   (obj) => {
-    console.log("resolving type of node", obj, obj.constructor, obj.constructor.name, obj.type);
+    //console.log("resolving type of node", obj, obj.constructor, obj.constructor.name, obj.type);
     return obj.__typeName;
   },
 );
@@ -25,7 +25,7 @@ export function getNode(type, id) {
         __typeName: "Post",
       };
     case "Comment":
-      console.log("resolving comment node", id);
+      //console.log("resolving comment node", id);
       return {
         ...allComments[id],
         __typeName: "Comment",

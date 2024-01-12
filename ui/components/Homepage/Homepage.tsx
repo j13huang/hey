@@ -1,6 +1,6 @@
 import { useState, Suspense } from "react";
 import { useLoaderData } from "react-router-dom";
-import { graphql, usePreloadedQuery, useFragment, PreloadedQuery } from "react-relay";
+import { graphql, usePreloadedQuery, PreloadedQuery } from "react-relay";
 import { HomepageAllPostsQuery as AllPostsQueryType } from "./__generated__/HomepageAllPostsQuery.graphql";
 import { HomepagePosts } from "./HomepagePosts";
 

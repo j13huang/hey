@@ -1,0 +1,46 @@
+.Comment {
+  list-style-type: none;
+  padding-left: 0;
+  margin-bottom: 8px;
+}
+
+.Comment--container {
+  display: flex;
+}
+
+.Comment--depthSpacers {
+  display: flex;
+}
+
+.Comment--depthSpacer {
+  margin-left: 16px;
+  margin-right: 8px;
+}
+
+.Comment--depthSpacer--leftBorder {
+  border-left: 1px solid rgb(203, 203, 203);
+}
+
+.Comment--bodyContainer {
+  border: 1px solid rgb(203, 203, 203);
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.Comment--actionBar {
+  display: flex;
+}
+
+.Comment--votes {
+  display: flex;
+  margin-right: 16px;
+}
+
+.Comment--voteButton {
+}
+
+.Comment--voteButton--voted {
+  color: lightgreen;
+}

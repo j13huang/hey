@@ -5,14 +5,16 @@ import {
   connectionArgs,
   connectionFromArray,
   mutationWithClientMutationId,
+  cursorForObjectInConnection,
   cursorToOffset,
+  offsetToCursor,
 } from "graphql-relay";
 import { PostType } from "./types/post";
-import { CommentType, CommentConnectionType } from "./types/comment";
+import { CommentType, CommentConnectionType, CommentEdgeType } from "./types/comment";
 import { allPosts, allComments, newPost, newComment } from "../../db/data";
 import { nodeField } from "./node";
 
-const { connectionType: PostConnection } = connectionDefinitions({
+const { connectionType: PostConnection, edgeType: PostEdgeType } = connectionDefinitions({
   nodeType: PostType,
 });
 
@@ -39,7 +41,9 @@ const queryType = new GraphQLObjectType({
         //await new Promise((resolve) => setTimeout(resolve, 2000));
         //let { type, id } = fromGlobalId(args.after || "");
         //console.log("eh", type, id);
-        console.log("allPosts", _obj, args, args.after ? cursorToOffset(args.after) : "");
+        //console.log("allPosts", _obj, args, args.after ? cursorToOffset(args.after) : "");
+        //console.log(offsetToCursor(0), offsetToCursor(1), offsetToCursor(2));
+        console.log(cursorForObjectInConnection(Object.values(allPosts).reverse(), allPosts["2"]));
         return connectionFromArray(Object.values(allPosts).reverse(), args);
       },
     },
@@ -90,18 +94,10 @@ const mutationType = new GraphQLObjectType({
       outputFields: {
         post: {
           type: PostType,
-          resolve: (payload) => allPosts[payload.id],
+          resolve: (payload) => allPosts[payload.postId],
         },
-        allPosts: {
-          type: PostConnection,
-          resolve: (payload, args, ctx, info) => {
-            console.log("mutate allPosts", payload, args);
-            // 'YXJyYXljb25uZWN0aW9uOjA='
-            console.log(connectionFromArray(Object.values(allPosts).reverse(), {}));
-            console.log(connectionFromArray(Object.values(allPosts).reverse(), { after: "YXJyYXljb25uZWN0aW9uOjA=" }));
-            return connectionFromArray(Object.values(allPosts).reverse(), {});
-            //return connectionFromArray(Object.values([allPosts[payload.id]]), {});
-          },
+        postEdge: {
+          type: PostEdgeType,
         },
       },
       mutateAndGetPayload: ({ title, body }, ctx, info) => {
@@ -110,7 +106,12 @@ const mutationType = new GraphQLObjectType({
         let userId = "1";
         const post = newPost(title, body, userId);
         return {
-          ...post,
+          postId: post.id,
+          postEdge: {
+            // doesn't matter to @prependEdge directive as long as it's non-null to conform to edge schema???
+            cursor: offsetToCursor(0),
+            node: post,
+          },
         };
       },
     }),
@@ -119,7 +120,7 @@ const mutationType = new GraphQLObjectType({
       inputFields: {
         // either postId or parentId is provided
         postId: {
-          type: GraphQLString,
+          type: GraphQLNonNull(GraphQLString),
         },
         parentId: {
           type: GraphQLString,
@@ -129,33 +130,24 @@ const mutationType = new GraphQLObjectType({
         },
       },
       outputFields: {
-        comment: {
-          type: PostType,
-          resolve: (payload) => allComments[payload.id],
-        },
-        commentsEdge: {
-          type: CommentConnectionType,
-          resolve: (payload) => {
-            if (payload.parentId) {
-              return connectionFromArray(
-                allComments[payload.parentId].children.map((id) => allComments[id]),
-                {},
-              );
-            }
-
-            return connectionFromArray(
-              allPosts[payload.postId].childCommentIds.map((id) => allComments[id]),
-              {},
-            );
-          },
+        commentEdge: {
+          type: CommentEdgeType,
+          //resolve: (payload) => allComments[payload.comment.id],
         },
       },
-      mutateAndGetPayload: ({ postId, parentId, body }, ctx, info) => {
-        console.log(ctx, info);
+      mutateAndGetPayload: ({ postId: relayPostId, parentId: relayParentId, body }, ctx, info) => {
+        let { id: postId } = fromGlobalId(relayPostId);
+        let { id: parentId } = fromGlobalId(relayParentId || "");
         // get userId from login context
-        const comment = newComment(postId, parentId, body, null);
+        let userId = "1";
+        const [comment, newCommentIndex] = newComment(postId, parentId, body, userId);
+
+        console.log("mutating new comment", comment, newCommentIndex, offsetToCursor(newCommentIndex));
         return {
-          ...comment,
+          commentEdge: {
+            cursor: offsetToCursor(newCommentIndex),
+            node: comment,
+          },
         };
       },
     }),

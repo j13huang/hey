@@ -4,53 +4,38 @@ import { clsx } from "clsx";
 import { NewCommentMutation as NewCommentMutationType } from "./__generated__/NewCommentMutation.graphql";
 
 import "./NewComment.css";
-
-/*
-const NewCommentRootMutation = graphql`
-  mutation NewCommentRootMutation($input: NewCommentInput!, $connections: [ID!]!) {
-    newComment(input: $input) {
-      comment {
-        id
-      }
-      commentsEdge {
-        edges @appendEdge(connections: $connections) {
-          node {
-            id
-            body
-          }
-        }
-      }
-    }
-  }
-`;
-*/
+import { ReadOnlyRecordProxy } from "relay-runtime";
 
 const NewCommentMutation = graphql`
-  mutation NewCommentMutation($input: NewCommentInput!, $connections: [ID!]!) {
+  mutation NewCommentMutation($input: NewCommentInput!) {
     newComment(input: $input) {
-      comment {
-        id
-      }
-      commentsEdge {
-        edges @appendEdge(connections: $connections) {
-          node {
-            id
-            body
-          }
+      commentEdge {
+        cursor
+        node {
+          id
+          ...CommentFragment
         }
       }
     }
   }
 `;
+
+/*
+      comment {
+        id
+        body
+      }
+*/
 
 type Props = {
   className?: string;
-  postId?: string;
+  postId: string;
   parentId?: string;
-  onPost?: () => void;
+  // not sure if the cursor can do anything
+  onPost?: (cursor?: string) => void;
 };
 
-export const NewComment: React.FC<Props> = ({ className, postId, parentId, onPost }) => {
+export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentId }) => {
   const [text, setText] = useState("");
   const [commitMutation, isMutationInFlight] = useMutation<NewCommentMutationType>(NewCommentMutation);
 
@@ -65,45 +50,66 @@ export const NewComment: React.FC<Props> = ({ className, postId, parentId, onPos
       />
       <button
         onClick={() => {
-          const connectionID = ConnectionHandler.getConnectionID(
-            (postId ? postId : parentId) || "",
-            "CommentTreeFragment_comments",
-          );
-          console.log("connectionID", connectionID);
+          //const connectionID = ConnectionHandler.getConnectionID(postId, "CommentsFragment_comments");
+          //console.log("connectionID", connectionID);
           commitMutation({
             variables: {
               input: {
                 body: text,
-                parentId,
                 postId,
+                parentId,
               },
-              connections: [connectionID],
             },
-            /* updater: (store, { newPost }) => {
-                console.log("updater", newPost);
-                const query = store.getRoot() as ReadOnlyRecordProxy;
-                console.log(query);
-                const connectionRecord = ConnectionHandler.getConnection(
-                  query,
-                  "HomepagePostsFragment_allPosts",
-                  //{first: 1, after: null}
-                );
-                console.log(connectionRecord);
-                /*
-              
-                const newComment = (...);
-                const newEdge = (...);
-              
+            updater: (store, { newComment }) => {
+              console.log("updater", newComment);
+              const postRecord = store.get(postId) as ReadOnlyRecordProxy;
+              const commentsConnectionRecord = ConnectionHandler.getConnection(postRecord, "CommentsFragment_comments");
+
+              // Get the payload returned from the server
+              const payload = store.getRootField("newComment");
+
+              // Get the edge inside the payload
+              const serverEdge = payload!.getLinkedRecord("commentEdge");
+
+              // Build edge for adding to the connection
+              const newEdge = ConnectionHandler.buildConnectionEdge(store, commentsConnectionRecord!, serverEdge);
+              const newEdgeNode = newEdge?.getLinkedRecord("node");
+
+              // Add edge to the end of the connection
+              const cursor = serverEdge.getValue("cursor");
+
+              console.log(
+                serverEdge,
+                newEdge,
+                commentsConnectionRecord,
+                newEdge?.getType(),
+                newEdge?.getValue("cursor"),
+                newEdgeNode?.getValue("id"),
+                //newEdgeNode?.getValue("user"),
+                newEdgeNode?.getValue("body"),
+                cursor,
+              );
+              if (parentId) {
+                // server should return a cursor to insert the comment as a child in the right spot
                 ConnectionHandler.insertEdgeAfter(
-                  connectionRecordSortedByDate,
-                  newEdge,
+                  commentsConnectionRecord!,
+                  newEdge!,
+                  cursor,
+                  //"YXJyYXljb25uZWN0aW9uOjE=", // || cursor,
                 );
-                return b;
-                */
-            //},
-            onCompleted: () => {
+              } else {
+                // insert the comment at the top for now so the user can see their post. refreshing will put it at the bottom
+                ConnectionHandler.insertEdgeBefore(
+                  commentsConnectionRecord!,
+                  newEdge!,
+                  //"YXJyYXljb25uZWN0aW9uOjE=", // || cursor,
+                );
+              }
+            },
+            onCompleted: ({ newComment }) => {
               if (onPost) {
-                onPost();
+                //onPost(newComment?.commentEdge?.node?.id);
+                onPost(newComment?.commentEdge?.cursor);
               }
             },
           });
@@ -111,6 +117,7 @@ export const NewComment: React.FC<Props> = ({ className, postId, parentId, onPos
       >
         post
       </button>
+      {parentId}
     </div>
   );
 };

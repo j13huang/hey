@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull } from "graphql";
+import { connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
 import { globalIdField } from "graphql-relay";
 import { nodeInterface } from "../node";
 
@@ -20,4 +21,8 @@ export const UserType = new GraphQLObjectType({
     name: { type: GraphQLNonNull(GraphQLString), description: "name" },
   }),
   //isTypeOf: (obj) => obj instanceof UserType,
+});
+
+const { connectionType: UserConnectionType } = connectionDefinitions({
+  nodeType: UserType,
 });

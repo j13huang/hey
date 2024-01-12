@@ -17,18 +17,18 @@ export const HomepagePostFragment = graphql`
 `;
 
 type Props = {
-  post: HomepagePostFragment$key;
+  postContainer: HomepagePostFragment$key;
 };
 
-export const HomepagePost: React.FC<Props> = ({ post }) => {
-  //console.log(post);
-  const data = useFragment(HomepagePostFragment, post);
+export const HomepagePost: React.FC<Props> = ({ postContainer }) => {
+  //console.log(postContainer);
+  const post = useFragment(HomepagePostFragment, postContainer);
   return (
-    <Link to={`/post/${data.id}`}>
+    <Link to={`/post/${post.id}`}>
       <div className="HomepagePost">
-        <h4>{data.title}</h4>
-        <p>{data.body}</p>
-        <p>posted by {data.user?.name ? data.user.name : "anonymous"}</p>
+        <h4>{post.title}</h4>
+        <p>{post.body}</p>
+        <p>posted by {post.user?.name ? post.user.name : "anonymous"}</p>
       </div>
     </Link>
   );

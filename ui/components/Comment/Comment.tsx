@@ -2,10 +2,11 @@ import { useState } from "react";
 import { graphql, useFragment } from "react-relay";
 import { CommentFragment$key } from "./__generated__/CommentFragment.graphql";
 import { clsx } from "clsx";
+import { NewComment } from "./NewComment";
 
 import "./Comment.css";
 
-export const CommentFragment = graphql`
+const CommentFragment = graphql`
   fragment CommentFragment on Comment {
     id
     body
@@ -21,33 +22,82 @@ export const CommentFragment = graphql`
 
 type Props = {
   className?: string;
-  comment: CommentFragment$key;
+  postId: string;
+  commentContainer: CommentFragment$key;
   isCollapsed?: boolean;
   onShowHideClick: () => void;
 };
 
-export const Comment: React.FC<Props> = ({ className, comment, isCollapsed, onShowHideClick }) => {
-  const data = useFragment(CommentFragment, comment);
-  //console.log(data);
+export const Comment: React.FC<Props> = ({ className, postId, commentContainer, isCollapsed, onShowHideClick }) => {
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const comment = useFragment(CommentFragment, commentContainer);
+  console.log("Comment", comment);
 
   return (
     <ul className={clsx("Comment", className)}>
-      <li>
-        <div>{new Array(data.depth).fill(0).map(() => "-")}</div>
-        <div className="Comment--container">
-          <span
-            className="Comment--collapseButton"
-            onClick={() => {
-              onShowHideClick();
-            }}
-          >
-            {/* en-dash */}[{isCollapsed ? "+" : "-"}]
-          </span>
+      <li className={""}>
+        <div className={"Comment--container"}>
+          <div className={"Comment--depthSpacers"}>
+            {new Array(comment.depth).fill(0).map((_, i) => (
+              <div
+                key={i}
+                className={clsx("Comment--depthSpacer", i === comment.depth - 1 && "Comment--depthSpacer--leftBorder")}
+              ></div>
+            ))}
+            {comment.depth}
+          </div>
           <div>
             <div>
-              {data.user.name} parent {data.parent?.id || "<no parent id>"}
+              <span
+                className="Comment--collapseButton"
+                onClick={() => {
+                  onShowHideClick();
+                }}
+              >
+                {/* en-dash */}[{isCollapsed ? "+" : "-"}]
+              </span>
+              &nbsp;
+              <span>
+                id: {comment.id} user: {comment.user.name} parentId: {comment.parent?.id || "<no parent id>"}
+              </span>
             </div>
-            <div>{!isCollapsed && <p>{data.body}</p>}</div>
+            <div>
+              {!isCollapsed && (
+                <div>
+                  <p className={"Comment--bodyContainer"}>{comment.body}</p>
+                  <div className={"Comment--actionBar"}>
+                    <div>
+                      <div className={"Comment--votes"}>
+                        <span>votes: {0}</span>
+                        <button className={clsx("Comment--voteButton")}>⬆</button>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setShowReplyForm(!showReplyForm);
+                      }}
+                    >
+                      reply
+                    </button>
+                  </div>
+                  {showReplyForm && (
+                    <div>
+                      <NewComment
+                        className={"CommentTree--NewComment"}
+                        postId={postId}
+                        parentId={comment.id}
+                        onPost={(cursor) => {
+                          setShowReplyForm(false);
+                          //refetch({});
+                          // does this cursor even do anything
+                          //refetch({ after: cursor });
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </li>
