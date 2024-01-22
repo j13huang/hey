@@ -67,9 +67,20 @@ type Post implements Node {
 
   """link (optional)"""
   link: String
-  createdAtMs: Int!
   user: User!
-  votes: VoteConnection!
+  votes(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): VoteConnection!
 
   """Comments for a post"""
   comments(
@@ -131,7 +142,10 @@ type VoteConnection {
   argument to "first", then fetch the total count so it could display "5 of 83",
   for example.
   """
-  voteCount: Int!
+  voteScore: Int!
+
+  """check if there is a positive vote value with the input userId"""
+  userVoteScore: Int!
 }
 
 """An edge in a connection."""
@@ -155,11 +169,8 @@ type Vote implements Node {
   """related comment"""
   comment: Comment
 
-  """vote value (-1, 0 or 1)"""
+  """vote value (1 or -1)"""
   value: Int!
-
-  """vote timestamp"""
-  updatedAtMs: Int!
 }
 
 """comment"""
@@ -172,7 +183,6 @@ type Comment implements Node {
 
   """body"""
   body: String!
-  createdAtMs: Int!
 
   """associated post"""
   post: Post!
@@ -226,10 +236,12 @@ type CommentEdge {
 type Mutation {
   newPost(input: NewPostInput!): NewPostPayload
   newComment(input: NewCommentInput!): NewCommentPayload
+  setVote(input: SetVoteInput!): SetVotePayload
+  removeVote(input: RemoveVoteInput!): RemoveVotePayload
 }
 
 type NewPostPayload {
-  post: Post
+  postId: ID!
   postEdge: PostEdge
   clientMutationId: String
 }
@@ -246,8 +258,39 @@ type NewCommentPayload {
 }
 
 input NewCommentInput {
-  postId: String!
-  parentId: String
+  postId: ID!
+  parentId: ID
   body: String!
+  clientMutationId: String
+}
+
+type SetVotePayload {
+  voteScore: Int!
+  userVoteScore: Int!
+
+  """if vote edge is null, then an existing vote got its value changed"""
+  voteEdge: VoteEdge
+  clientMutationId: String
+}
+
+input SetVoteInput {
+  postId: ID
+  commentId: ID
+
+  """1 or -1"""
+  value: Int!
+  clientMutationId: String
+}
+
+type RemoveVotePayload {
+  deletedVoteId: ID!
+  voteScore: Int!
+  userVoteScore: Int!
+  clientMutationId: String
+}
+
+input RemoveVoteInput {
+  postId: String
+  commentId: String
   clientMutationId: String
 }

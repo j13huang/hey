@@ -41,6 +41,6 @@
 .Comment--voteButton {
 }
 
-.Comment--voteButton--voted {
+.Comment--voteButton--hasVoted {
   color: lightgreen;
 }

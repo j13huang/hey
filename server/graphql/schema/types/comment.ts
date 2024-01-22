@@ -17,9 +17,9 @@ export const CommentType = new GraphQLObjectType({
     id: globalIdField(),
     user: { type: GraphQLNonNull(UserType), description: "user" },
     body: { type: GraphQLNonNull(GraphQLString), description: "body" },
-    createdAtMs: {
-      type: GraphQLNonNull(GraphQLInt),
-    },
+    //createdAtMs: {
+    //type: GraphQLNonNull(GraphQLInt),
+    //},
     post: {
       type: GraphQLNonNull(PostType),
       description: "associated post",

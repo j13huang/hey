@@ -73,7 +73,7 @@ function renderComments(
 
 export const Comments: React.FC<Props> = ({ className, postContainer, postId }) => {
   const { data, loadNext, hasNext, isLoadingNext, refetch } = usePaginationFragment(CommentsFragment, postContainer);
-  console.log(data.comments?.edges);
+  //console.log(data.comments?.edges);
   const [collapsedComments, setCollapsedComments] = useState<{ [key: string]: boolean }>({});
 
   return (

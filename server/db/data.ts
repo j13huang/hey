@@ -14,6 +14,127 @@ export const allUsers: { [key: string]: User } = {
   [firstUser.id]: firstUser,
 };
 
+interface Vote {
+  id: string;
+  value: number;
+  postId?: string;
+  commentId?: string;
+  user: User;
+  updatedAtMs: number;
+}
+const firstPostVote: Vote = {
+  id: "1",
+  user: {
+    id: "1",
+    name: "john",
+  },
+  postId: "1",
+  value: 1,
+  updatedAtMs: 1705023492886,
+};
+
+const firstPostFirstCommentVote: Vote = {
+  id: "2",
+  user: {
+    id: "1",
+    name: "john",
+  },
+  commentId: "1",
+  value: 1,
+  updatedAtMs: 1705023492886,
+};
+
+const thirdPostVote: Vote = {
+  id: "3",
+  user: {
+    id: "1",
+    name: "john",
+  },
+  postId: "3",
+  value: 1,
+  updatedAtMs: 1705023492886,
+};
+
+export const allVotes: { [key: string]: Vote } = {
+  [firstPostVote.id]: firstPostVote,
+  [firstPostFirstCommentVote.id]: firstPostFirstCommentVote,
+  [thirdPostVote.id]: thirdPostVote,
+};
+
+export function setVote(postId, commentId, userId, value) {
+  let entityId;
+  let entity: Post | Comment;
+  if (postId) {
+    entity = allPosts[postId];
+    entityId = `post-${postId}`;
+  } else {
+    entity = allComments[commentId];
+    entityId = `comment-${commentId}`;
+  }
+
+  let existingVoteObjectId = entity.voteIds.find((id) => allVotes[id].user.id === userId);
+  let existingVoteObject = existingVoteObjectId ? allVotes[existingVoteObjectId] : null;
+  if (existingVoteObject) {
+    existingVoteObject.value = value;
+    return {
+      newVote: null,
+      newVoteScore: calculateVoteScore(entity),
+    };
+  }
+
+  let hash = crypto.createHash("md5").update(`${entityId}-user-${userId}`).digest("hex");
+  let newVote: Vote = {
+    id: `${entityId}-${hash.slice(0, 6)}`,
+    user: allUsers[userId],
+    postId,
+    commentId,
+    value: value,
+    updatedAtMs: Date.now(),
+  };
+
+  allVotes[newVote.id] = newVote;
+  entity.voteIds.push(newVote.id);
+
+  return {
+    voteId: newVote.id,
+    newVoteScore: calculateVoteScore(entity),
+    newVote,
+  };
+}
+
+export function deleteVote(postId, commentId, userId) {
+  let entity: Post | Comment;
+  if (postId) {
+    entity = allPosts[postId];
+  } else {
+    entity = allComments[commentId];
+  }
+
+  // remove any votes that match this user id
+  let newVoteIds: string[] = [];
+  let deletedVoteId = "";
+  entity.voteIds.forEach((id) => {
+    if (allVotes[id].user.id === userId) {
+      delete allVotes[id];
+      deletedVoteId = id;
+      return;
+    }
+    newVoteIds.push(id);
+  });
+  entity.voteIds = newVoteIds;
+
+  return {
+    deletedVoteId,
+    newVoteScore: calculateVoteScore(entity),
+  };
+}
+
+function calculateVoteScore(entity: { voteIds: string[] }) {
+  return entity.voteIds.reduce((score, voteId) => {
+    return score + allVotes[voteId].value;
+  }, 0);
+}
+
 interface Comment {
   id: string;
   user: User;
@@ -24,6 +145,7 @@ interface Comment {
   parentId?: string;
   depth: number;
   children: Array<string>;
+  voteIds: Array<string>;
 }
 
 const firstPostComment1Reply1Reply1: Comment = {
@@ -35,6 +157,7 @@ const firstPostComment1Reply1Reply1: Comment = {
   //parentId: firstPostComment1Reply1.id,
   depth: 2,
   children: [],
+  voteIds: [],
 };
 
 const firstPostComment1Reply1: Comment = {
@@ -46,6 +169,7 @@ const firstPostComment1Reply1: Comment = {
   //parentId: firstPostComment1.id,
   depth: 1,
   children: [firstPostComment1Reply1Reply1.id],
+  voteIds: [],
 };
 
 const firstPostComment1: Comment = {
@@ -56,6 +180,7 @@ const firstPostComment1: Comment = {
   postId: "1",
   depth: 0,
   children: [firstPostComment1Reply1.id],
+  voteIds: [],
 };
 
 const firstPostComment2Reply1: Comment = {
@@ -67,6 +192,7 @@ const firstPostComment2Reply1: Comment = {
   //parentId: firstPostComment2.id,
   depth: 1,
   children: [],
+  voteIds: [],
 };
 
 const firstPostComment2: Comment = {
@@ -77,6 +203,7 @@ const firstPostComment2: Comment = {
   postId: "1",
   depth: 0,
   children: [firstPostComment2Reply1.id],
+  voteIds: [],
 };
 
 const firstPostComment3: Comment = {
@@ -87,6 +214,7 @@ const firstPostComment3: Comment = {
   createdAtMs: 1705023492886,
   depth: 0,
   children: [],
+  voteIds: [],
 };
 
 const secondPostComment1: Comment = {
@@ -97,6 +225,7 @@ const secondPostComment1: Comment = {
   createdAtMs: 1705023492886,
   depth: 0,
   children: [],
+  voteIds: [],
 };
 
 // https://stackoverflow.com/a/23202095
@@ -118,7 +247,7 @@ Object.values(allComments).forEach((comment) => {
   });
 });
 
-export const newComment = (postId, parentId, body, userId): [Comment, number] => {
+export const newComment = (postId, parentId, body, userId): { comment: Comment; newCommentIndex: number } => {
   let hash = crypto.createHash("md5").update(body).digest("hex");
   const comment = {
     id: `${postId}-${parentId || "root"}-${hash.slice(0, 6)}`,
@@ -129,6 +258,7 @@ export const newComment = (postId, parentId, body, userId): [Comment, number] =>
     createdAtMs: new Date().getTime(),
     depth: allComments[parentId] ? allComments[parentId].depth + 1 : 0,
     children: [],
+    voteIds: [],
   };
   allComments[comment.id] = comment;
 
@@ -142,7 +272,7 @@ export const newComment = (postId, parentId, body, userId): [Comment, number] =>
   }
   console.log(post.commentIds);
   let newCommentIndex = parentIdIndex === -1 ? post.commentIds.length - 2 : parentIdIndex;
-  return [comment, newCommentIndex];
+  return { comment, newCommentIndex };
   //return [comment, post.commentIds.length - 2];
 };
 
@@ -153,8 +283,9 @@ interface Post {
   link?: string;
   createdAtMs: number;
   user: User;
-  childCommentIds: Array<string>;
+  treeCommentIds: Array<string>;
   commentIds: Array<string>;
+  voteIds: Array<string>;
 }
 const firstPost: Post = {
   id: "1",
@@ -163,12 +294,13 @@ const firstPost: Post = {
   link: "",
   user: firstUser,
   createdAtMs: 1705023492886,
-  childCommentIds: Object.values(allComments)
+  treeCommentIds: Object.values(allComments)
     .filter((c) => c.postId === "1" && c.depth === 0)
     .map((c) => c.id),
   commentIds: Object.values(allComments)
     .filter((c) => c.postId === "1")
     .map((c) => c.id),
+  voteIds: ["1"],
 };
 const secondPost: Post = {
   id: "2",
@@ -177,12 +309,13 @@ const secondPost: Post = {
   link: "",
   user: firstUser,
   createdAtMs: 1705023492886,
-  childCommentIds: Object.values(allComments)
+  treeCommentIds: Object.values(allComments)
     .filter((c) => c.postId === "2" && c.depth === 0)
     .map((c) => c.id),
   commentIds: Object.values(allComments)
     .filter((c) => c.postId === "2")
     .map((c) => c.id),
+  voteIds: [],
 };
 
 const thirdPost: Post = {
@@ -192,8 +325,9 @@ const thirdPost: Post = {
   link: "",
   user: firstUser,
   createdAtMs: 1705023492886,
-  childCommentIds: [],
+  treeCommentIds: [],
   commentIds: [],
+  voteIds: ["3"],
 };
 
 export const allPosts: { [key: string]: Post } = {
@@ -212,29 +346,10 @@ export const newPost = (title, body, userId) => {
     link: "",
     user: allUsers[userId],
     createdAtMs: new Date().getTime(),
-    childCommentIds: [],
+    treeCommentIds: [],
     commentIds: [],
+    voteIds: [],
   };
   allPosts[post.id] = post;
   return post;
-};
-
-interface Vote {
-  id: string;
-  value: number;
-  user: User;
-  updatedAtMs: number;
-}
-const firstPostVote: Vote = {
-  id: "1",
-  user: {
-    id: "1",
-    name: "john",
-  },
-  value: 1,
-  updatedAtMs: 1705023492886,
-};
-
-export const allVotes: { [key: string]: Vote } = {
-  [firstPostVote.id]: firstPostVote,
 };

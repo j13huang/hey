@@ -2,9 +2,9 @@ import { useState } from "react";
 import { graphql, useFragment, useMutation, ConnectionHandler } from "react-relay";
 import { clsx } from "clsx";
 import { NewCommentMutation as NewCommentMutationType } from "./__generated__/NewCommentMutation.graphql";
+import { ReadOnlyRecordProxy } from "relay-runtime";
 
 import "./NewComment.css";
-import { ReadOnlyRecordProxy } from "relay-runtime";
 
 const NewCommentMutation = graphql`
   mutation NewCommentMutation($input: NewCommentInput!) {

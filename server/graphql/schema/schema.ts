@@ -1,4 +1,12 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLID, GraphQLNonNull, GraphQLString, GraphQLList } from "graphql";
+import {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLList,
+  GraphQLInt,
+} from "graphql";
 import {
   fromGlobalId,
   connectionDefinitions,
@@ -8,11 +16,13 @@ import {
   cursorForObjectInConnection,
   cursorToOffset,
   offsetToCursor,
+  toGlobalId,
 } from "graphql-relay";
 import { PostType } from "./types/post";
 import { CommentType, CommentConnectionType, CommentEdgeType } from "./types/comment";
-import { allPosts, allComments, newPost, newComment } from "../../db/data";
+import { allPosts, allComments, newPost, newComment, setVote, deleteVote } from "../../db/data";
 import { nodeField } from "./node";
+import { VoteConnectionType, VoteEdgeType } from "./types/vote";
 
 const { connectionType: PostConnection, edgeType: PostEdgeType } = connectionDefinitions({
   nodeType: PostType,
@@ -92,9 +102,8 @@ const mutationType = new GraphQLObjectType({
         },
       },
       outputFields: {
-        post: {
-          type: PostType,
-          resolve: (payload) => allPosts[payload.postId],
+        postId: {
+          type: GraphQLNonNull(GraphQLID),
         },
         postEdge: {
           type: PostEdgeType,
@@ -106,7 +115,7 @@ const mutationType = new GraphQLObjectType({
         let userId = "1";
         const post = newPost(title, body, userId);
         return {
-          postId: post.id,
+          postId: toGlobalId("Post", post.id),
           postEdge: {
             // doesn't matter to @prependEdge directive as long as it's non-null to conform to edge schema???
             cursor: offsetToCursor(0),
@@ -118,12 +127,12 @@ const mutationType = new GraphQLObjectType({
     newComment: mutationWithClientMutationId({
       name: "NewComment",
       inputFields: {
-        // either postId or parentId is provided
         postId: {
-          type: GraphQLNonNull(GraphQLString),
+          type: GraphQLNonNull(GraphQLID),
         },
+        // if parentId is provided, then it's not a top-level comment
         parentId: {
-          type: GraphQLString,
+          type: GraphQLID,
         },
         body: {
           type: new GraphQLNonNull(GraphQLString),
@@ -140,7 +149,7 @@ const mutationType = new GraphQLObjectType({
         let { id: parentId } = fromGlobalId(relayParentId || "");
         // get userId from login context
         let userId = "1";
-        const [comment, newCommentIndex] = newComment(postId, parentId, body, userId);
+        const { comment, newCommentIndex } = newComment(postId, parentId, body, userId);
 
         console.log("mutating new comment", comment, newCommentIndex, offsetToCursor(newCommentIndex));
         return {
@@ -148,6 +157,96 @@ const mutationType = new GraphQLObjectType({
             cursor: offsetToCursor(newCommentIndex),
             node: comment,
           },
+        };
+      },
+    }),
+    setVote: mutationWithClientMutationId({
+      // creates or updates vote
+      name: "SetVote",
+      inputFields: {
+        // either postId or commentId is provided
+        postId: {
+          type: GraphQLID,
+        },
+        commentId: {
+          type: GraphQLID,
+        },
+        value: {
+          type: GraphQLNonNull(GraphQLInt),
+          description: "1 or -1",
+        },
+      },
+      outputFields: {
+        /*
+        votes: {
+          type: GraphQLNonNull(VoteConnectionType),
+        },
+        */
+        voteScore: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+        userVoteScore: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+        voteEdge: {
+          type: VoteEdgeType,
+          description: "if vote edge is null, then an existing vote got its value changed",
+        },
+      },
+      mutateAndGetPayload: ({ postId: relayPostId, commentId: relayCommentId, value }, ctx, info) => {
+        let { id: postId } = fromGlobalId(relayPostId || "");
+        let { id: commentId } = fromGlobalId(relayCommentId || "");
+        // get userId from login context
+        let userId = "1";
+        let { newVote, newVoteScore } = setVote(postId, commentId, userId, value);
+
+        return {
+          voteScore: newVoteScore,
+          userVoteScore: value,
+          voteEdge:
+            newVote == null
+              ? null
+              : {
+                  cursor: "",
+                  node: newVote,
+                },
+        };
+      },
+    }),
+    removeVote: mutationWithClientMutationId({
+      // creates or updates vote
+      name: "RemoveVote",
+      inputFields: {
+        // either postId or commentId is provided
+        postId: {
+          type: GraphQLString,
+        },
+        commentId: {
+          type: GraphQLString,
+        },
+      },
+      outputFields: {
+        deletedVoteId: {
+          type: GraphQLNonNull(GraphQLID),
+        },
+        voteScore: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+        userVoteScore: {
+          type: GraphQLNonNull(GraphQLInt),
+        },
+      },
+      mutateAndGetPayload: ({ postId: relayPostId, commentId: relayCommentId, value }, ctx, info) => {
+        let { id: postId } = fromGlobalId(relayPostId || "");
+        let { id: commentId } = fromGlobalId(relayCommentId || "");
+        // get userId from login context
+        let userId = "1";
+        let { deletedVoteId, newVoteScore } = deleteVote(postId, commentId, userId);
+
+        return {
+          deletedVoteId: toGlobalId("Vote", deletedVoteId),
+          voteScore: newVoteScore,
+          userVoteScore: 0,
         };
       },
     }),

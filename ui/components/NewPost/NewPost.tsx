@@ -2,18 +2,20 @@ import { useState, Suspense } from "react";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { graphql, usePreloadedQuery, PreloadedQuery, useMutation, readInlineData, ConnectionHandler } from "react-relay";
 import { NewPostMutation as NewPostMutationType } from "./__generated__/NewPostMutation.graphql";
-import { HomepagePostFragment } from "../Homepage/HomepagePost";
 
 import "./NewPost.css";
 
+/*
+      post {
+        id
+      }
+*/
 // not sure if this is relevant if i use a fragment https://github.com/facebook/relay/issues/2250
 // actually i think i should use @inline if i use a fragment
 const NewPostMutation = graphql`
   mutation NewPostMutation($input: NewPostInput!, $connections: [ID!]!) {
     newPost(input: $input) {
-      post {
-        id
-      }
+      postId
       postEdge @prependEdge(connections: $connections) {
         cursor
         node {
@@ -97,7 +99,7 @@ export const NewPost: React.FC<Props> = (props) => {
                 //const post = readInlineData(HomepagePostFragment, newPost!.post);
                 //const post = useFragment(HomepagePostFragment, newPost!.post);
                 console.log("onComplete new post", newPost);
-                navigate(`/post/${newPost!.post!.id}`);
+                navigate(`/post/${newPost!.postId}`);
                 //navigate(`/`);
               },
             });
