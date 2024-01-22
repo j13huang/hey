@@ -15,13 +15,13 @@ export const CommentType = new GraphQLObjectType({
   interfaces: [nodeInterface],
   fields: () => ({
     id: globalIdField(),
-    user: { type: GraphQLNonNull(UserType), description: "user" },
-    body: { type: GraphQLNonNull(GraphQLString), description: "body" },
+    user: { type: new GraphQLNonNull(UserType), description: "user" },
+    body: { type: new GraphQLNonNull(GraphQLString), description: "body" },
     //createdAtMs: {
-    //type: GraphQLNonNull(GraphQLInt),
+    //type: new GraphQLNonNull(GraphQLInt),
     //},
     post: {
-      type: GraphQLNonNull(PostType),
+      type: new GraphQLNonNull(PostType),
       description: "associated post",
       resolve: (comment, args) => {
         console.log(comment, args);
@@ -38,11 +38,11 @@ export const CommentType = new GraphQLObjectType({
       },
     },
     depth: {
-      type: GraphQLNonNull(GraphQLInt),
+      type: new GraphQLNonNull(GraphQLInt),
     },
-    //children: { type: GraphQLNonNull(commentConnection), description: "children comments" },
+    //children: { type: new GraphQLNonNull(commentConnection), description: "children comments" },
     children: {
-      type: GraphQLNonNull(CommentConnectionType),
+      type: new GraphQLNonNull(CommentConnectionType),
       description: "children comments",
       args: connectionArgs,
       resolve: (comment, args) => {
@@ -80,7 +80,7 @@ export const { connectionType: CommentConnectionType, edgeType: CommentEdgeType 
   nodeType: CommentType,
   connectionFields: () => ({
     commentCount: {
-      type: GraphQLNonNull(GraphQLInt),
+      type: new GraphQLNonNull(GraphQLInt),
       description: `A count of the total number of objects in this connection, ignoring pagination.
 This allows a client to fetch the first five objects by passing "5" as the
 argument to "first", then fetch the total count so it could display "5 of 83",

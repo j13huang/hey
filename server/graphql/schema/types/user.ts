@@ -18,7 +18,7 @@ export const UserType = new GraphQLObjectType({
   interfaces: [nodeInterface],
   fields: () => ({
     id: globalIdField(),
-    name: { type: GraphQLNonNull(GraphQLString), description: "name" },
+    name: { type: new GraphQLNonNull(GraphQLString), description: "name" },
   }),
   //isTypeOf: (obj) => obj instanceof UserType,
 });

@@ -103,7 +103,7 @@ const mutationType = new GraphQLObjectType({
       },
       outputFields: {
         postId: {
-          type: GraphQLNonNull(GraphQLID),
+          type: new GraphQLNonNull(GraphQLID),
         },
         postEdge: {
           type: PostEdgeType,
@@ -128,7 +128,7 @@ const mutationType = new GraphQLObjectType({
       name: "NewComment",
       inputFields: {
         postId: {
-          type: GraphQLNonNull(GraphQLID),
+          type: new GraphQLNonNull(GraphQLID),
         },
         // if parentId is provided, then it's not a top-level comment
         parentId: {
@@ -172,21 +172,21 @@ const mutationType = new GraphQLObjectType({
           type: GraphQLID,
         },
         value: {
-          type: GraphQLNonNull(GraphQLInt),
+          type: new GraphQLNonNull(GraphQLInt),
           description: "1 or -1",
         },
       },
       outputFields: {
         /*
         votes: {
-          type: GraphQLNonNull(VoteConnectionType),
+          type: new GraphQLNonNull(VoteConnectionType),
         },
         */
         voteScore: {
-          type: GraphQLNonNull(GraphQLInt),
+          type: new GraphQLNonNull(GraphQLInt),
         },
         userVoteScore: {
-          type: GraphQLNonNull(GraphQLInt),
+          type: new GraphQLNonNull(GraphQLInt),
         },
         voteEdge: {
           type: VoteEdgeType,
@@ -227,13 +227,13 @@ const mutationType = new GraphQLObjectType({
       },
       outputFields: {
         deletedVoteId: {
-          type: GraphQLNonNull(GraphQLID),
+          type: new GraphQLNonNull(GraphQLID),
         },
         voteScore: {
-          type: GraphQLNonNull(GraphQLInt),
+          type: new GraphQLNonNull(GraphQLInt),
         },
         userVoteScore: {
-          type: GraphQLNonNull(GraphQLInt),
+          type: new GraphQLNonNull(GraphQLInt),
         },
       },
       mutateAndGetPayload: ({ postId: relayPostId, commentId: relayCommentId, value }, ctx, info) => {

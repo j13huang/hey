@@ -20,7 +20,7 @@ export const VoteType = new GraphQLObjectType({
   interfaces: [nodeInterface],
   fields: () => ({
     id: globalIdField(),
-    user: { type: GraphQLNonNull(UserType) },
+    user: { type: new GraphQLNonNull(UserType) },
     post: {
       description: "related post",
       type: PostType,
@@ -35,10 +35,10 @@ export const VoteType = new GraphQLObjectType({
         return getNode("Comment", vote.commentId);
       },
     },
-    value: { type: GraphQLNonNull(GraphQLInt), description: "vote value (1 or -1)" },
+    value: { type: new GraphQLNonNull(GraphQLInt), description: "vote value (1 or -1)" },
     //updatedAtMs: {
     //description: "vote timestamp",
-    //type: GraphQLNonNull(GraphQLInt),
+    //type: new GraphQLNonNull(GraphQLInt),
     //},
   }),
   //isTypeOf: (obj) => obj instanceof UserType,
@@ -48,7 +48,7 @@ export const { connectionType: VoteConnectionType, edgeType: VoteEdgeType } = co
   nodeType: VoteType,
   connectionFields: () => ({
     voteScore: {
-      type: GraphQLNonNull(GraphQLInt),
+      type: new GraphQLNonNull(GraphQLInt),
       description: `A count of the total number of objects in this connection, ignoring pagination.
 This allows a client to fetch the first five objects by passing "5" as the
 argument to "first", then fetch the total count so it could display "5 of 83",
@@ -62,11 +62,11 @@ for example.`,
     },
     // technically could be calculated only on the frontend
     userVoteScore: {
-      type: GraphQLNonNull(GraphQLInt),
+      type: new GraphQLNonNull(GraphQLInt),
       /*
       args: {
         userId: {
-          type: GraphQLNonNull(GraphQLString),
+          type: new GraphQLNonNull(GraphQLString),
         },
       },
       */

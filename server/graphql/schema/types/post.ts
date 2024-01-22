@@ -24,13 +24,13 @@ export const PostType = new GraphQLObjectType({
   interfaces: [nodeInterface],
   fields: () => ({
     id: globalIdField(),
-    title: { type: GraphQLNonNull(GraphQLString), description: "title" },
-    body: { type: GraphQLNonNull(GraphQLString), description: "body" },
+    title: { type: new GraphQLNonNull(GraphQLString), description: "title" },
+    body: { type: new GraphQLNonNull(GraphQLString), description: "body" },
     link: { type: GraphQLString, description: "link (optional)" },
     //createdAtMs: {
-    //type: GraphQLNonNull(GraphQLInt),
+    //type: new GraphQLNonNull(GraphQLInt),
     //},
-    user: { type: GraphQLNonNull(UserType) },
+    user: { type: new GraphQLNonNull(UserType) },
     /*
     user: {
       type: userConnection,
@@ -43,7 +43,7 @@ export const PostType = new GraphQLObjectType({
     */
     /*
     votes: {
-      type: GraphQLNonNull(VoteConnectionType),
+      type: new GraphQLNonNull(VoteConnectionType),
       args: {
         ...connectionArgs,
         userId: {
@@ -67,7 +67,7 @@ export const PostType = new GraphQLObjectType({
     },
     */
     votes: {
-      type: GraphQLNonNull(VoteConnectionType),
+      type: new GraphQLNonNull(VoteConnectionType),
       args: connectionArgs,
       resolve: (post, args) => {
         console.log("post votes", post, post.voteIds);
@@ -81,7 +81,7 @@ export const PostType = new GraphQLObjectType({
     },
 
     comments: {
-      type: GraphQLNonNull(CommentConnectionType),
+      type: new GraphQLNonNull(CommentConnectionType),
       description: "Comments for a post",
       args: connectionArgs,
       resolve: (post, args) => {
@@ -95,7 +95,7 @@ export const PostType = new GraphQLObjectType({
       },
     },
     commentTree: {
-      type: GraphQLNonNull(CommentConnectionType),
+      type: new GraphQLNonNull(CommentConnectionType),
       description: "Comments for a post",
       args: connectionArgs,
       resolve: (post, args) => {
