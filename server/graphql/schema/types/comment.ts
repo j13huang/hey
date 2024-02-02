@@ -1,9 +1,11 @@
 import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLInt, GraphQLNonNull } from "graphql";
 import { globalIdField, connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
 import { nodeInterface, getNode } from "../node";
+import { VoteConnectionType } from "./vote";
+import { VoteableInterface } from "./voteableInterface";
 import { UserType } from "./user";
 import { PostType } from "./post";
-import { allComments } from "../../../db/data";
+import { allComments, allVotes } from "../../../db/data";
 
 /**
  * We define our basic comment type.
@@ -12,7 +14,7 @@ import { allComments } from "../../../db/data";
 export const CommentType = new GraphQLObjectType({
   name: "Comment",
   description: "comment",
-  interfaces: [nodeInterface],
+  interfaces: [nodeInterface, VoteableInterface],
   fields: () => ({
     id: globalIdField(),
     user: { type: new GraphQLNonNull(UserType), description: "user" },
@@ -53,6 +55,19 @@ export const CommentType = new GraphQLObjectType({
           }),
           args,
         );
+      },
+    },
+    votes: {
+      type: new GraphQLNonNull(VoteConnectionType),
+      args: connectionArgs,
+      resolve: (comment, args) => {
+        console.log("comment votes", comment, comment.voteIds);
+        let votes = comment.voteIds.map((voteId) => {
+          return allVotes[voteId];
+        });
+        return connectionFromArray(votes, {
+          ...args,
+        });
       },
     },
   }),

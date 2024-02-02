@@ -59,7 +59,7 @@ const VoteButtonsRemoveVoteMutation = graphql`
     votes {
   */
 const VoteButtonsFragment = graphql`
-  fragment VoteButtonsFragment on Post {
+  fragment VoteButtonsFragment on Voteable {
     votes(first: 20) @connection(key: "VoteButtonsFragment_votes") {
       __id
       voteScore
@@ -181,6 +181,8 @@ export const VoteButtons: React.FC<Props> = ({ postId, commentId, voteButtonsCon
 
               // not sure why buildConnectionEdge doesn't work here
               //const newEdge = ConnectionHandler.buildConnectionEdge(store, connectionRecord!, serverEdge);
+
+              // we can use this if we don't have a paginated @connection directive on the connection
               //ConnectionHandler.insertEdgeAfter(connectionRecord!, newEdge!);
 
               connectionRecord?.setValue(setVote?.voteScore, "voteScore");

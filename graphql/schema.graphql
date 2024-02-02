@@ -55,7 +55,7 @@ type PostEdge {
 }
 
 """post"""
-type Post implements Node {
+type Post implements Node & Voteable {
   """The ID of an object"""
   id: ID!
 
@@ -119,13 +119,21 @@ interface Node {
   id: ID!
 }
 
-"""user"""
-type User implements Node {
-  """The ID of an object"""
-  id: ID!
+"""voteable entity"""
+interface Voteable {
+  votes(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
 
-  """name"""
-  name: String!
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): VoteConnection!
 }
 
 """A connection to a list of items."""
@@ -173,8 +181,17 @@ type Vote implements Node {
   value: Int!
 }
 
+"""user"""
+type User implements Node {
+  """The ID of an object"""
+  id: ID!
+
+  """name"""
+  name: String!
+}
+
 """comment"""
-type Comment implements Node {
+type Comment implements Node & Voteable {
   """The ID of an object"""
   id: ID!
 
@@ -205,6 +222,19 @@ type Comment implements Node {
     """Returns the last n items from the list."""
     last: Int
   ): CommentConnection!
+  votes(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): VoteConnection!
 }
 
 """A connection to a list of items."""

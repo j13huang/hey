@@ -6,6 +6,7 @@ import { CommentConnectionType } from "./comment";
 import { VoteConnectionType } from "./vote";
 import { UserType } from "./user";
 import { allUsers, allComments, allVotes } from "../../../db/data";
+import { VoteableInterface } from "./voteableInterface";
 
 /**
  * We define our post type, which implements the node interface.
@@ -21,7 +22,7 @@ import { allUsers, allComments, allVotes } from "../../../db/data";
 export const PostType = new GraphQLObjectType({
   name: "Post",
   description: "post",
-  interfaces: [nodeInterface],
+  interfaces: [nodeInterface, VoteableInterface],
   fields: () => ({
     id: globalIdField(),
     title: { type: new GraphQLNonNull(GraphQLString), description: "title" },
@@ -44,22 +45,12 @@ export const PostType = new GraphQLObjectType({
     /*
     votes: {
       type: new GraphQLNonNull(VoteConnectionType),
-      args: {
-        ...connectionArgs,
-        userId: {
-          type: GraphQLString,
-        },
-      },
+      args: connectionArgs,
       resolve: (post, args) => {
-        let votes: any[] = [];
-        post.voteIds.forEach((voteId) => {
-          let vote = allVotes[voteId];
-          if (args.userId && vote.user.id !== args.userId) {
-            return;
-          }
-          votes.push(vote);
+        console.log("post votes", post, post.voteIds);
+        let votes = post.voteIds.map((voteId) => {
+          return allVotes[voteId];
         });
-        //console.log("resolving comments on post", comments);
         return connectionFromArray(votes, {
           ...args,
         });
@@ -79,7 +70,6 @@ export const PostType = new GraphQLObjectType({
         });
       },
     },
-
     comments: {
       type: new GraphQLNonNull(CommentConnectionType),
       description: "Comments for a post",
@@ -94,6 +84,7 @@ export const PostType = new GraphQLObjectType({
         });
       },
     },
+    // deprecated probably
     commentTree: {
       type: new GraphQLNonNull(CommentConnectionType),
       description: "Comments for a post",

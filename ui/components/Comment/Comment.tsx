@@ -3,6 +3,7 @@ import { graphql, useFragment } from "react-relay";
 import { CommentFragment$key } from "./__generated__/CommentFragment.graphql";
 import { clsx } from "clsx";
 import { NewComment } from "./NewComment";
+import { VoteButtons } from "../Votes/VoteButtons";
 
 import "./Comment.css";
 
@@ -17,6 +18,7 @@ const CommentFragment = graphql`
     user {
       name
     }
+    ...VoteButtonsFragment
   }
 `;
 
@@ -66,12 +68,7 @@ export const Comment: React.FC<Props> = ({ className, postId, commentContainer, 
                 <div>
                   <p className={"Comment--bodyContainer"}>{comment.body}</p>
                   <div className={"Comment--actionBar"}>
-                    <div>
-                      <div className={"Comment--votes"}>
-                        <span>votes: {0}</span>
-                        <button className={clsx("Comment--voteButton")}>⬆</button>
-                      </div>
-                    </div>
+                    <VoteButtons commentId={comment.id} voteButtonsContainer={comment!} />
                     <button
                       onClick={() => {
                         setShowReplyForm(!showReplyForm);
