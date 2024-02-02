@@ -73,28 +73,6 @@ export const NewPost: React.FC<Props> = (props) => {
                 },
                 connections: [connectionID],
               },
-              /* updater: (store, { newPost }) => {
-                console.log("updater", newPost);
-                const query = store.getRoot() as ReadOnlyRecordProxy;
-                console.log(query);
-                const connectionRecord = ConnectionHandler.getConnection(
-                  query,
-                  "HomepagePostsFragment_allPosts",
-                  //{first: 1, after: null}
-                );
-                console.log(connectionRecord);
-                /*
-              
-                const newComment = (...);
-                const newEdge = (...);
-              
-                ConnectionHandler.insertEdgeAfter(
-                  connectionRecordSortedByDate,
-                  newEdge,
-                );
-                return b;
-                */
-              //},
               onCompleted: ({ newPost }) => {
                 //const post = readInlineData(HomepagePostFragment, newPost!.post);
                 //const post = useFragment(HomepagePostFragment, newPost!.post);

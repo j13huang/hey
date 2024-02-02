@@ -61,7 +61,7 @@ for example.`,
       },
     },
     // technically could be calculated only on the frontend
-    userVoteScore: {
+    userVoteValue: {
       type: new GraphQLNonNull(GraphQLInt),
       /*
       args: {
@@ -78,7 +78,7 @@ for example.`,
           return 0;
         }
         let userVote = (connection.edges || []).find(({ node }) => node.user.id === userId);
-        console.log("userVoteScore", userVote, userVote ? userVote.node.value : 0);
+        console.log("userVoteValue", userVote, userVote ? userVote.node.value : 0);
         return userVote ? userVote.node.value : 0;
       },
     },

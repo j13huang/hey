@@ -10,32 +10,60 @@ import { VoteButtonsRemoveVoteMutation as RemoveVoteMutationType } from "./__gen
 import "./VoteButtons.css";
 
 const VoteButtonsSetVoteMutation = graphql`
-  mutation VoteButtonsSetVoteMutation($input: SetVoteInput!) {
+  mutation VoteButtonsSetVoteMutation($input: SetVoteInput!, $connections: [ID!]!) {
     setVote(input: $input) {
       voteScore
-      userVoteScore
+      userVoteValue
+      voteEdge @prependEdge(connections: $connections) {
+        cursor
+        node {
+          id
+        }
+      }
     }
   }
 `;
+/*
+
+  mutation VoteButtonsSetVoteMutation($input: SetVoteInput!) {
+
+      voteEdge {
+        cursor
+        node {
+          id
+        }
+      }
+
+
+      voteEdge @appendEdge(connections: $connections) {
+        cursor
+        node {
+          id
+        }
+      }
+*/
 
 const VoteButtonsRemoveVoteMutation = graphql`
   mutation VoteButtonsRemoveVoteMutation($input: RemoveVoteInput!, $connections: [ID!]!) {
     removeVote(input: $input) {
       voteScore
-      userVoteScore
+      userVoteValue
       deletedVoteId @deleteEdge(connections: $connections)
     }
   }
 `;
 
-//@argumentDefinitions(userId: { type: "String!", defaultValue: "" })
-//hasVoted(userId: $userId)
+/*
+@argumentDefinitions(userId: { type: "String!", defaultValue: "" })
+    votes(first: 0) @connection(key: "VoteButtonsFragment_votes") {
+    votes {
+  */
 const VoteButtonsFragment = graphql`
   fragment VoteButtonsFragment on Post {
-    votes {
+    votes(first: 20) @connection(key: "VoteButtonsFragment_votes") {
       __id
       voteScore
-      userVoteScore
+      userVoteValue
       edges {
         node {
           id
@@ -58,14 +86,14 @@ export const VoteButtons: React.FC<Props> = ({ postId, commentId, voteButtonsCon
     useMutation<RemoveVoteMutationType>(VoteButtonsRemoveVoteMutation);
   return (
     <div>
-      {JSON.stringify(votes)}
-      votes: {votes!.voteScore}{" "}
+      <div>{JSON.stringify(votes)}</div>
+      votes: {votes!.voteScore} {votes!.__id}
       <button
-        className={clsx(votes!.userVoteScore === 1 && "VoteButtons--button--hasUpVoted")}
+        className={clsx(votes!.userVoteValue === 1 && "VoteButtons--button--hasUpVoted")}
         onClick={() => {
-          if (votes!.userVoteScore === 1) {
-            //const connectionID = ConnectionHandler.getConnectionID(postId, "CommentsFragment_comments");
-            //console.log("connectionID", connectionID);
+          //const connectionID = ConnectionHandler.getConnectionID(postId || commentId || "", "VoteButtonsFragment_votes");
+          //console.log("connectionID", connectionID);
+          if (votes!.userVoteValue === 1) {
             commitRemoveVoteMutation({
               variables: {
                 input: {
@@ -73,8 +101,10 @@ export const VoteButtons: React.FC<Props> = ({ postId, commentId, voteButtonsCon
                   commentId,
                 },
                 connections: [votes!.__id],
+                //connections: [connectionID],
               },
-              updater: (store, { removeVote }) => {
+              updater: (store, response) => {
+                let removeVote = response!.removeVote;
                 console.log("updater removevote", removeVote);
                 const parentEntityRecord = store.get(postId || commentId || "") as ReadOnlyRecordProxy;
                 const votesConnectionRecord = parentEntityRecord!.getLinkedRecord("votes");
@@ -90,9 +120,13 @@ export const VoteButtons: React.FC<Props> = ({ postId, commentId, voteButtonsCon
                   //votesConnectionRecord2,
                   //votesConnectionRecord === votesConnectionRecord2,
                   payload,
+                  removeVote,
                 );
-                votesConnectionRecord?.setValue(removeVote?.voteScore, "voteScore");
-                votesConnectionRecord?.setValue(removeVote?.userVoteScore, "userVoteScore");
+                //votesConnectionRecord?.setValue(removeVote?.voteScore, "voteScore");
+                //votesConnectionRecord?.setValue(removeVote?.userVoteValue, "userVoteValue");
+
+                connectionRecord?.setValue(removeVote?.voteScore, "voteScore");
+                connectionRecord?.setValue(removeVote?.userVoteValue, "userVoteValue");
 
                 // Get the edge inside the payload
                 //const serverEdge = payload!.getLinkedRecord("votes");
@@ -110,26 +144,47 @@ export const VoteButtons: React.FC<Props> = ({ postId, commentId, voteButtonsCon
                 commentId,
                 value: 1,
               },
+              connections: [votes!.__id],
+              //connections: [connectionID],
             },
-            updater: (store, { setVote }) => {
-              console.log("updater", setVote);
+            updater: (store, response) => {
+              const setVote = response?.setVote;
+              console.log("updater", response);
               const parentEntityRecord = store.get(postId || commentId || "") as ReadOnlyRecordProxy;
               const votesConnectionRecord = parentEntityRecord!.getLinkedRecord("votes");
+              const connectionRecord = store.get(votes!.__id);
+              //ConnectionHandler.getConnectionID()
               //const votesConnectionRecord2 = ConnectionHandler.getConnection(parentEntityRecord, "votes");
+              //const votesConnectionRecord3 = ConnectionHandler.getConnection(parentEntityRecord, votes!.__id);
+              //const connectionID = ConnectionHandler.getConnectionID(postId || commentId || "", votes!.__id);
+              //const votesConnectionRecord4 = store.get(connectionID);
 
               // Get the payload returned from the server
               const payload = store.getRootField("setVote");
               console.log(
                 votesConnectionRecord,
                 //votesConnectionRecord2,
-                //votesConnectionRecord === votesConnectionRecord2,
+                votesConnectionRecord === connectionRecord,
+                //votesConnectionRecord3,
+                //connectionID,
+                //votesConnectionRecord4,
                 payload,
               );
-              votesConnectionRecord?.setValue(setVote?.voteScore, "voteScore");
-              votesConnectionRecord?.setValue(setVote?.userVoteScore, "userVoteScore");
 
               // Get the edge inside the payload
-              //const serverEdge = payload!.getLinkedRecord("votes");
+              const serverEdge = payload!.getLinkedRecord("voteEdge");
+              //console.log(serverEdge.getType());
+              const serverEdgeNode = serverEdge!.getLinkedRecord("node");
+              const newEdge = ConnectionHandler.createEdge(store, connectionRecord!, serverEdgeNode, "VoteEdge");
+              //let thing = votesConnectionRecord?.getValue("__connection_next_edge_index");
+              //let thyoa = connectionRecord?.getValue("__connection_next_edge_index");
+
+              // not sure why buildConnectionEdge doesn't work here
+              //const newEdge = ConnectionHandler.buildConnectionEdge(store, connectionRecord!, serverEdge);
+              //ConnectionHandler.insertEdgeAfter(connectionRecord!, newEdge!);
+
+              connectionRecord?.setValue(setVote?.voteScore, "voteScore");
+              connectionRecord?.setValue(setVote?.userVoteValue, "userVoteValue");
             },
             optimisticUpdater: () => {},
             onCompleted: ({ setVote }) => {},

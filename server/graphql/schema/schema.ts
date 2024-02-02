@@ -185,7 +185,7 @@ const mutationType = new GraphQLObjectType({
         voteScore: {
           type: new GraphQLNonNull(GraphQLInt),
         },
-        userVoteScore: {
+        userVoteValue: {
           type: new GraphQLNonNull(GraphQLInt),
         },
         voteEdge: {
@@ -202,7 +202,7 @@ const mutationType = new GraphQLObjectType({
 
         return {
           voteScore: newVoteScore,
-          userVoteScore: value,
+          userVoteValue: value,
           voteEdge:
             newVote == null
               ? null
@@ -232,7 +232,7 @@ const mutationType = new GraphQLObjectType({
         voteScore: {
           type: new GraphQLNonNull(GraphQLInt),
         },
-        userVoteScore: {
+        userVoteValue: {
           type: new GraphQLNonNull(GraphQLInt),
         },
       },
@@ -246,7 +246,7 @@ const mutationType = new GraphQLObjectType({
         return {
           deletedVoteId: toGlobalId("Vote", deletedVoteId),
           voteScore: newVoteScore,
-          userVoteScore: 0,
+          userVoteValue: 0,
         };
       },
     }),

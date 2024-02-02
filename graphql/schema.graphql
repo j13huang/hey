@@ -145,7 +145,7 @@ type VoteConnection {
   voteScore: Int!
 
   """check if there is a positive vote value with the input userId"""
-  userVoteScore: Int!
+  userVoteValue: Int!
 }
 
 """An edge in a connection."""
@@ -266,7 +266,7 @@ input NewCommentInput {
 
 type SetVotePayload {
   voteScore: Int!
-  userVoteScore: Int!
+  userVoteValue: Int!
 
   """if vote edge is null, then an existing vote got its value changed"""
   voteEdge: VoteEdge
@@ -285,7 +285,7 @@ input SetVoteInput {
 type RemoveVotePayload {
   deletedVoteId: ID!
   voteScore: Int!
-  userVoteScore: Int!
+  userVoteValue: Int!
   clientMutationId: String
 }
 

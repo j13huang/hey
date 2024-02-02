@@ -43,6 +43,7 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
     <div className={clsx(className)}>
       <textarea
         className={"NewComment--textarea"}
+        name={`${postId}${parentId ? `-${parentId}` : ""}-NewComment`}
         onChange={(e) => {
           setText(e.target.value);
         }}
@@ -50,8 +51,6 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
       />
       <button
         onClick={() => {
-          //const connectionID = ConnectionHandler.getConnectionID(postId, "CommentsFragment_comments");
-          //console.log("connectionID", connectionID);
           commitMutation({
             variables: {
               input: {
@@ -60,8 +59,9 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
                 parentId,
               },
             },
-            updater: (store, { newComment }) => {
-              console.log("updater", newComment);
+            updater: (store, response) => {
+              //const newComment = response?.newComment!
+              //console.log("updater", newComment);
               const postRecord = store.get(postId) as ReadOnlyRecordProxy;
               const commentsConnectionRecord = ConnectionHandler.getConnection(postRecord, "CommentsFragment_comments");
 
@@ -88,6 +88,7 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
                 //newEdgeNode?.getValue("user"),
                 newEdgeNode?.getValue("body"),
                 cursor,
+                commentsConnectionRecord?.getValue("__connection_next_edge_index"),
               );
               if (parentId) {
                 // server should return a cursor to insert the comment as a child in the right spot

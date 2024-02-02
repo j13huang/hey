@@ -82,7 +82,7 @@ export function setVote(postId, commentId, userId, value) {
     };
   }
 
-  let hash = crypto.createHash("md5").update(`${entityId}-user-${userId}`).digest("hex");
+  let hash = crypto.createHash("md5").update(`${entityId}-user-${userId}-${new Date().getTime()}`).digest("hex");
   let newVote: Vote = {
     id: `${entityId}-${hash.slice(0, 6)}`,
     user: allUsers[userId],
