@@ -4,11 +4,12 @@ import RelayEnvironment from "./lib/graphql/RelayEnvironment";
 
 //import { Homepage } from "./components/Homepage";
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider, redirect } from "react-router-dom";
-import { loadQuery, usePreloadedQuery } from "react-relay";
+import { loadQuery, usePreloadedQuery, useLazyLoadQuery } from "react-relay";
 import { Layout } from "./components/Layout";
 import { Homepage, AllPostsQuery } from "./components/Homepage";
 import { HomepageAllPostsQuery as AllPostsQueryType } from "./components/Homepage/__generated__/HomepageAllPostsQuery.graphql";
 import { Post, PostQuery } from "./components/Post";
+import { SingleCommentLoader } from "./components/Comments/SingleCommentLoader";
 import { NewPost } from "./components/NewPost";
 import { PostQuery as PostQueryType } from "./components/Post/__generated__/PostQuery.graphql";
 
@@ -39,11 +40,11 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: "post/:postId",
+          path: "posts/:postId",
           loader: ({ params }) => {
             const preloadedQuery = loadQuery<PostQueryType>(RelayEnvironment, PostQuery, {
               /* query variables */
-              postID: params.postId || "",
+              postId: params.postId || "",
             });
             return {
               preloadedQuery,
@@ -54,16 +55,39 @@ const router = createBrowserRouter(
               <Post />
             </Suspense>
           ),
+          children: [
+            {
+              path: "comments/:commentId",
+              loader: ({ params }) => {
+                console.log("comments loader", params);
+                /*
+                const preloadedQuery = loadQuery<PostQueryType>(RelayEnvironment, PostQuery, {
+                  postID: params.postId || "",
+                });
+                return {
+                  preloadedQuery,
+                };
+                */
+                return {};
+              },
+              element: (
+                <Suspense fallback="Loading single comment...">
+                  <SingleCommentLoader />
+                </Suspense>
+              ),
+            },
+          ],
         },
         {
-          path: "post/new",
+          path: "posts/new",
           element: <NewPost />,
         },
       ],
     },
     {
       path: "*",
-      loader: () => {
+      loader: ({ params }) => {
+        console.log("*****", params);
         return redirect("/");
       },
     },

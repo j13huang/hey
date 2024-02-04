@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { graphql, useFragment, useMutation, ConnectionHandler } from "react-relay";
+import { useNavigate } from "react-router-dom";
 import { clsx } from "clsx";
 import { NewCommentMutation as NewCommentMutationType } from "./__generated__/NewCommentMutation.graphql";
 import { ReadOnlyRecordProxy } from "relay-runtime";
@@ -36,6 +37,7 @@ type Props = {
 };
 
 export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentId }) => {
+  const navigate = useNavigate();
   const [text, setText] = useState("");
   const [commitMutation, isMutationInFlight] = useMutation<NewCommentMutationType>(NewCommentMutation);
 
@@ -63,7 +65,11 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
               //const newComment = response?.newComment!
               //console.log("updater", newComment);
               const postRecord = store.get(postId) as ReadOnlyRecordProxy;
-              const commentsConnectionRecord = ConnectionHandler.getConnection(postRecord, "CommentsFragment_comments");
+              //const commentsConnectionRecord = ConnectionHandler.getConnection(postRecord, "CommentsFragment_comments");
+              const commentsConnectionRecord = ConnectionHandler.getConnection(
+                postRecord,
+                "PostCommentsLoaderFragment_comments",
+              );
 
               // Get the payload returned from the server
               const payload = store.getRootField("newComment");
@@ -90,13 +96,17 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
                 cursor,
                 commentsConnectionRecord?.getValue("__connection_next_edge_index"),
               );
+
+              ConnectionHandler.insertEdgeAfter(commentsConnectionRecord!, newEdge!, parentId ? cursor : null);
+              /*
+                https://github.com/facebook/relay/issues/2761
+                probably need to implement id based insertion separatly if we want to handle multiple insertions properly
               if (parentId) {
                 // server should return a cursor to insert the comment as a child in the right spot
                 ConnectionHandler.insertEdgeAfter(
                   commentsConnectionRecord!,
                   newEdge!,
-                  cursor,
-                  //"YXJyYXljb25uZWN0aW9uOjE=", // || cursor,
+                  parentId ? cursor : null,
                 );
               } else {
                 // insert the comment at the top for now so the user can see their post. refreshing will put it at the bottom
@@ -106,11 +116,13 @@ export const NewComment: React.FC<Props> = ({ className, postId, onPost, parentI
                   //"YXJyYXljb25uZWN0aW9uOjE=", // || cursor,
                 );
               }
+              */
             },
             onCompleted: ({ newComment }) => {
               if (onPost) {
+                navigate(`/posts/${postId}/comments/${newComment?.commentEdge?.node?.id!}`);
                 //onPost(newComment?.commentEdge?.node?.id);
-                onPost(newComment?.commentEdge?.cursor);
+                //onPost(newComment?.commentEdge?.cursor);
               }
             },
           });

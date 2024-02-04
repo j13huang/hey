@@ -57,6 +57,56 @@ const queryType = new GraphQLObjectType({
         return connectionFromArray(Object.values(allPosts).reverse(), args);
       },
     },
+    commentsWithParent: {
+      type: new GraphQLNonNull(CommentConnectionType),
+      description: "get individual comment, and all children comments for this comment",
+      args: {
+        // maybe do ...connectionArgs here for future
+        postId: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+        commentId: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+      },
+      resolve: async (_obj, { postId: relayPostId, commentId: relayCommentId }) => {
+        let { id: postId } = fromGlobalId(relayPostId);
+        let { id: commentId } = fromGlobalId(relayCommentId);
+        let post = allPosts[postId];
+
+        const result: Array<any> = [];
+        let i = 0;
+        let matchingComment: any = null;
+        while (i < post.commentIds.length) {
+          let postCommentId = post.commentIds[i];
+          if (commentId === postCommentId) {
+            matchingComment = allComments[commentId];
+            result.push(matchingComment);
+            i++;
+            break;
+          }
+          i++;
+        }
+
+        console.log("resolve commentsWithParent", postId, commentId, post.commentIds, matchingComment);
+        if (matchingComment == null) {
+          return connectionFromArray(result, {});
+        }
+
+        while (i < post.commentIds.length) {
+          let postCommentId = post.commentIds[i];
+          let comment = allComments[postCommentId];
+          if (comment.depth <= matchingComment.depth) {
+            break;
+          }
+          result.push(comment);
+          i++;
+        }
+
+        console.log(result);
+        return connectionFromArray(result, {});
+      },
+    },
     /*
     // probably don't need this because we can query by node???
     post: {

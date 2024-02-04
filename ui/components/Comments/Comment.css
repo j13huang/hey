@@ -17,8 +17,11 @@
   margin-right: 8px;
 }
 
-.Comment--depthSpacer--leftBorder {
+.Comment--leftBorder {
   border-left: 1px solid rgb(203, 203, 203);
+  border-bottom: 1px solid rgb(203, 203, 203);
+  width: 8px;
+  margin-right: 8px;
 }
 
 .Comment--bodyContainer {

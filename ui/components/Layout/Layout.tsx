@@ -1,5 +1,5 @@
 import { useState, Suspense } from "react";
-import { Link, useLoaderData, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, useLoaderData, Outlet, useNavigate } from "react-router-dom";
 
 import "./Layout.css";
 
@@ -12,10 +12,10 @@ export const Layout: React.FC<any> = (props) => {
     <div className="Layout--container">
       <header className="Layout--header">
         <div className="Layout--headerItemsLeft">
-          <Link to={`/`}>Home</Link>
+          <NavLink to={`/`}>Home</NavLink>
         </div>
         <div className="Layout--headerItemsRight">
-          {location.pathname !== "/post/new" ? <button onClick={() => navigate("/post/new")}>new post</button> : null}
+          {location.pathname !== "/posts/new" ? <button onClick={() => navigate("/posts/new")}>new post</button> : null}
         </div>
       </header>
       <div className="Layout">

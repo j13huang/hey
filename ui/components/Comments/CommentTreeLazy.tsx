@@ -3,7 +3,7 @@ import { graphql, useLazyLoadQuery } from "react-relay";
 import { CommentTreeLazyQuery as CommentTreeLazyQueryType } from "./__generated__/CommentTreeLazyQuery.graphql";
 import { clsx } from "clsx";
 
-import { Comment, CommentFragment } from "../Comment";
+import { Comment, CommentFragment } from ".";
 
 import "./CommentTree.css";
 

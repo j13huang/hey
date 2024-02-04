@@ -1,4 +1,12 @@
-import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull, GraphQLInt, GraphQLInputObjectType } from "graphql";
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLInt,
+  GraphQLInputObjectType,
+  GraphQLBoolean,
+} from "graphql";
 import { connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
 import { globalIdField } from "graphql-relay";
 import { nodeInterface, getNode } from "../node";
@@ -61,7 +69,7 @@ export const PostType = new GraphQLObjectType({
       type: new GraphQLNonNull(VoteConnectionType),
       args: connectionArgs,
       resolve: (post, args) => {
-        console.log("post votes", post, post.voteIds);
+        //console.log("post votes", post, post.voteIds);
         let votes = post.voteIds.map((voteId) => {
           return allVotes[voteId];
         });

@@ -30,14 +30,6 @@ export const HomepagePosts: React.FC<Props> = ({ allPosts }) => {
   //console.log(data!.allPosts!.__id);
   //console.log(data);
 
-  /*
-    https://github.com/facebook/relay/issues/1701#issuecomment-301330514
-    A common practice is to have a structure such as:
-
-    RefetchContainer // to refetch the connection in-full when filter arguments change
-      PaginationContainer // to fetch more items with the same filter arguments
-        Array<FragmentContainer> // to render each edge
-    */
   return (
     <div className="HomepagePosts">
       {(data.allPosts?.edges || []).map((e: any, i: number) => (

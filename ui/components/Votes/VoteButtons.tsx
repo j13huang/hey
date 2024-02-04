@@ -14,7 +14,7 @@ const VoteButtonsSetVoteMutation = graphql`
     setVote(input: $input) {
       voteScore
       userVoteValue
-      voteEdge @prependEdge(connections: $connections) {
+      voteEdge @appendEdge(connections: $connections) {
         cursor
         node {
           id
@@ -60,7 +60,7 @@ const VoteButtonsRemoveVoteMutation = graphql`
   */
 const VoteButtonsFragment = graphql`
   fragment VoteButtonsFragment on Voteable {
-    votes(first: 20) @connection(key: "VoteButtonsFragment_votes") {
+    votes(first: 100) @connection(key: "VoteButtonsFragment_votes") {
       __id
       voteScore
       userVoteValue

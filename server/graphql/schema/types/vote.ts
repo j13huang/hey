@@ -54,7 +54,7 @@ This allows a client to fetch the first five objects by passing "5" as the
 argument to "first", then fetch the total count so it could display "5 of 83",
 for example.`,
       resolve: (connection, args, ctx, info) => {
-        console.log("votes connection???", connection, args, info);
+        //console.log("votes connection???", connection, args, info);
         return (connection.edges || []).reduce((score, edge) => {
           return score + edge.node.value;
         }, 0);

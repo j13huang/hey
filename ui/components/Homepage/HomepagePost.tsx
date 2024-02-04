@@ -24,7 +24,7 @@ export const HomepagePost: React.FC<Props> = ({ postContainer }) => {
   //console.log(postContainer);
   const post = useFragment(HomepagePostFragment, postContainer);
   return (
-    <Link to={`/post/${post.id}`}>
+    <Link to={`/posts/${post.id}`}>
       <div className="HomepagePost">
         <h4>{post.title}</h4>
         <p>{post.body}</p>

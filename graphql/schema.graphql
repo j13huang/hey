@@ -14,6 +14,9 @@ type Query {
     last: Int
   ): PostConnection
 
+  """get individual comment, and all children comments for this comment"""
+  commentsWithParent(postId: ID!, commentId: ID!): CommentConnection!
+
   """Fetches an object given its ID"""
   node(
     """The ID of an object"""

@@ -77,7 +77,7 @@ export const NewPost: React.FC<Props> = (props) => {
                 //const post = readInlineData(HomepagePostFragment, newPost!.post);
                 //const post = useFragment(HomepagePostFragment, newPost!.post);
                 console.log("onComplete new post", newPost);
-                navigate(`/post/${newPost!.postId}`);
+                navigate(`/posts/${newPost!.postId}`);
                 //navigate(`/`);
               },
             });
