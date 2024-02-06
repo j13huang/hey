@@ -286,6 +286,7 @@ interface Post {
   treeCommentIds: Array<string>;
   commentIds: Array<string>;
   voteIds: Array<string>;
+  tags: { [key: string]: boolean };
 }
 const firstPost: Post = {
   id: "1",
@@ -301,6 +302,7 @@ const firstPost: Post = {
     .filter((c) => c.postId === "1")
     .map((c) => c.id),
   voteIds: ["1"],
+  tags: {},
 };
 const secondPost: Post = {
   id: "2",
@@ -316,6 +318,7 @@ const secondPost: Post = {
     .filter((c) => c.postId === "2")
     .map((c) => c.id),
   voteIds: [],
+  tags: {},
 };
 
 const thirdPost: Post = {
@@ -328,6 +331,7 @@ const thirdPost: Post = {
   treeCommentIds: [],
   commentIds: [],
   voteIds: ["3"],
+  tags: { engineering: true },
 };
 
 export const allPosts: { [key: string]: Post } = {
@@ -336,7 +340,7 @@ export const allPosts: { [key: string]: Post } = {
   [thirdPost.id]: thirdPost,
 };
 
-export const newPost = (title, body, userId) => {
+export const newPost = (title, body, userId, tags: string[]) => {
   const posts = Object.values(allPosts);
   const largestId = parseInt(posts[posts.length - 1].id);
   const post = {
@@ -349,6 +353,10 @@ export const newPost = (title, body, userId) => {
     treeCommentIds: [],
     commentIds: [],
     voteIds: [],
+    tags: tags.reduce((acc, tag) => {
+      acc[tag] = true;
+      return acc;
+    }, {}),
   };
   allPosts[post.id] = post;
   return post;

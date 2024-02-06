@@ -1,1 +1,2 @@
-export * from "./CommentNode";
+export * from "./PostCommentsLoader";
+export * from "./SingleCommentLoader";

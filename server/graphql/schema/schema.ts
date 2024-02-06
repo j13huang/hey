@@ -6,6 +6,7 @@ import {
   GraphQLString,
   GraphQLList,
   GraphQLInt,
+  GraphQLInputObjectType,
 } from "graphql";
 import {
   fromGlobalId,
@@ -28,6 +29,15 @@ const { connectionType: PostConnection, edgeType: PostEdgeType } = connectionDef
   nodeType: PostType,
 });
 
+const PostFilterInputType = new GraphQLInputObjectType({
+  name: "PostFilter",
+  fields: {
+    tags: {
+      type: new GraphQLList(GraphQLString),
+    },
+  },
+});
+
 /**
  * This is the type that will be the root of our query, and the
  * entry point into our schema.
@@ -45,16 +55,24 @@ const queryType = new GraphQLObjectType({
     allPosts: {
       type: PostConnection,
       description: "posts",
-      args: connectionArgs,
+      args: {
+        ...connectionArgs,
+        filter: {
+          type: PostFilterInputType,
+        },
+      },
       resolve: async (_obj, args) => {
-        //console.log("SLEEPING", allPosts);
-        //await new Promise((resolve) => setTimeout(resolve, 2000));
-        //let { type, id } = fromGlobalId(args.after || "");
-        //console.log("eh", type, id);
         //console.log("allPosts", _obj, args, args.after ? cursorToOffset(args.after) : "");
         //console.log(offsetToCursor(0), offsetToCursor(1), offsetToCursor(2));
-        console.log(cursorForObjectInConnection(Object.values(allPosts).reverse(), allPosts["2"]));
-        return connectionFromArray(Object.values(allPosts).reverse(), args);
+        //console.log(cursorForObjectInConnection(Object.values(allPosts).reverse(), allPosts["2"]));
+        let results = Object.values(allPosts).reverse();
+        if ((args.filter?.tags || []).length) {
+          //console.log("filtering", results);
+          results = results.filter((post) => {
+            return args.filter.tags.some((tag) => post.tags[tag]);
+          });
+        }
+        return connectionFromArray(results, args);
       },
     },
     commentsWithParent: {
@@ -88,9 +106,9 @@ const queryType = new GraphQLObjectType({
           i++;
         }
 
-        console.log("resolve commentsWithParent", postId, commentId, post.commentIds, matchingComment);
+        console.log("resolve commentsWithParent", postId, commentId, post.commentIds, matchingComment, result);
         if (matchingComment == null) {
-          return connectionFromArray(result, {});
+          return connectionFromArray([], {});
         }
 
         while (i < post.commentIds.length) {
@@ -103,7 +121,7 @@ const queryType = new GraphQLObjectType({
           i++;
         }
 
-        console.log(result);
+        //console.log(result);
         return connectionFromArray(result, {});
       },
     },
@@ -150,6 +168,9 @@ const mutationType = new GraphQLObjectType({
         body: {
           type: new GraphQLNonNull(GraphQLString),
         },
+        tags: {
+          type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+        },
       },
       outputFields: {
         postId: {
@@ -159,11 +180,11 @@ const mutationType = new GraphQLObjectType({
           type: PostEdgeType,
         },
       },
-      mutateAndGetPayload: ({ title, body }, ctx, info) => {
+      mutateAndGetPayload: ({ title, body, tags }, ctx, info) => {
         //console.log("mutateandget newpost", ctx, info);
         // get userId from login context
         let userId = "1";
-        const post = newPost(title, body, userId);
+        const post = newPost(title, body, userId, tags);
         return {
           postId: toGlobalId("Post", post.id),
           postEdge: {

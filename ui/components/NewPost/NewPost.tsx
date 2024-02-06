@@ -3,6 +3,8 @@ import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { graphql, usePreloadedQuery, PreloadedQuery, useMutation, readInlineData, ConnectionHandler } from "react-relay";
 import { NewPostMutation as NewPostMutationType } from "./__generated__/NewPostMutation.graphql";
 
+import { TagPicker } from "../Tags/TagPicker";
+
 import "./NewPost.css";
 
 /*
@@ -33,6 +35,7 @@ export const NewPost: React.FC<Props> = (props) => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [commitMutation, isMutationInFlight] = useMutation<NewPostMutationType>(NewPostMutation);
 
   return (
@@ -60,6 +63,12 @@ export const NewPost: React.FC<Props> = (props) => {
           />
         </label>
       </div>
+      <div>tags</div>
+      <TagPicker
+        onChange={(newTags) => {
+          setTags(newTags);
+        }}
+      />
       <div>
         <button
           onClick={() => {
@@ -70,6 +79,7 @@ export const NewPost: React.FC<Props> = (props) => {
                 input: {
                   title,
                   body,
+                  tags,
                 },
                 connections: [connectionID],
               },

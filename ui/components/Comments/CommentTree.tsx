@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { graphql, useFragment, usePaginationFragment } from "react-relay";
-import { CommentTreeFragment$key } from "./__generated__/CommentTreeFragment.graphql";
+//import { CommentTreeFragment$key } from "./__generated__/CommentTreeFragment.graphql";
 import { clsx } from "clsx";
 
 import { Comment } from "./CommentNode";
 
 import "./CommentTree.css";
 
+const CommentTreeFragment: any = null;
 // https://github.com/graphql/graphql-spec/issues/91#issuecomment-254895093
-export const CommentTreeFragment = graphql`
+/*
+const CommentTreeFragment = graphql`
   fragment CommentTreeFragment on Post
   @argumentDefinitions(cursor: { type: "String" }, count: { type: "Int", defaultValue: 2 })
   @refetchable(queryName: "CommentTreeCommentsPaginationQuery") {
@@ -38,10 +40,12 @@ export const CommentTreeFragment = graphql`
     }
   }
 `;
+*/
 
 type Props = {
   className?: string;
-  post: CommentTreeFragment$key;
+  //post: CommentTreeFragment$key;
+  post: any;
 };
 
 export const CommentTree: React.FC<Props> = ({ className, post }) => {
@@ -62,7 +66,7 @@ export const CommentTree: React.FC<Props> = ({ className, post }) => {
       {JSON.stringify(data)}
       {isVisible && (
         <>
-          {(data?.commentTree?.edges || []).map((e, i) => {
+          {(data?.commentTree?.edges || []).map((e: any, i: any) => {
             return <Comment key={i} first commentTree={e!.node!} />;
           })}
           {hasNext && <button onClick={() => loadNext(1)}>load more</button>}

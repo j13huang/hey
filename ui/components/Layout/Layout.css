@@ -13,6 +13,5 @@
   display: flex;
 }
 
-.Layout {
-  margin-top: 32px;
+.Layout--childContainer {
 }

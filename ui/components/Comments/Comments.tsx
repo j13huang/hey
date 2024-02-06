@@ -69,6 +69,14 @@ function renderComments(
   return components;
 }
 
+/*
+ https://github.com/facebook/relay/issues/1701#issuecomment-301330514
+ A common practice is to have a structure such as:
+
+ RefetchContainer // to refetch the connection in-full when filter arguments change
+   PaginationContainer // to fetch more items with the same filter arguments
+     Array<FragmentContainer> // to render each edge
+ */
 export const Comments: React.FC<Props> = ({ className, commentsEdgesContainer, postId }) => {
   const commentsEdges = useFragment(CommentsEdgesFragment, commentsEdgesContainer);
   const [collapsedComments, setCollapsedComments] = useState<{ [key: string]: boolean }>({});

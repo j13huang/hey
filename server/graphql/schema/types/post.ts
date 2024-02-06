@@ -6,6 +6,7 @@ import {
   GraphQLInt,
   GraphQLInputObjectType,
   GraphQLBoolean,
+  GraphQLList,
 } from "graphql";
 import { connectionDefinitions, connectionArgs, connectionFromArray } from "graphql-relay";
 import { globalIdField } from "graphql-relay";
@@ -50,21 +51,6 @@ export const PostType = new GraphQLObjectType({
       },
     },
     */
-    /*
-    votes: {
-      type: new GraphQLNonNull(VoteConnectionType),
-      args: connectionArgs,
-      resolve: (post, args) => {
-        console.log("post votes", post, post.voteIds);
-        let votes = post.voteIds.map((voteId) => {
-          return allVotes[voteId];
-        });
-        return connectionFromArray(votes, {
-          ...args,
-        });
-      },
-    },
-    */
     votes: {
       type: new GraphQLNonNull(VoteConnectionType),
       args: connectionArgs,
@@ -92,6 +78,7 @@ export const PostType = new GraphQLObjectType({
         });
       },
     },
+    /*
     // deprecated probably
     commentTree: {
       type: new GraphQLNonNull(CommentConnectionType),
@@ -107,6 +94,14 @@ export const PostType = new GraphQLObjectType({
             ...args,
           },
         );
+      },
+    },
+    */
+    tags: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+      description: "tags",
+      resolve: (post, args) => {
+        return Object.keys(post.tags).filter((t) => !!post.tags[t]);
       },
     },
   }),

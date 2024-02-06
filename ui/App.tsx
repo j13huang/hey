@@ -9,7 +9,7 @@ import { Layout } from "./components/Layout";
 import { Homepage, AllPostsQuery } from "./components/Homepage";
 import { HomepageAllPostsQuery as AllPostsQueryType } from "./components/Homepage/__generated__/HomepageAllPostsQuery.graphql";
 import { Post, PostQuery } from "./components/Post";
-import { SingleCommentLoader } from "./components/Comments/SingleCommentLoader";
+import { SingleCommentLoader } from "./components/Comments";
 import { NewPost } from "./components/NewPost";
 import { PostQuery as PostQueryType } from "./components/Post/__generated__/PostQuery.graphql";
 

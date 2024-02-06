@@ -43,6 +43,8 @@ export const CommentType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLInt),
     },
     //children: { type: new GraphQLNonNull(commentConnection), description: "children comments" },
+    /*
+    deprecated probably. not using commentTree
     children: {
       type: new GraphQLNonNull(CommentConnectionType),
       description: "children comments",
@@ -57,6 +59,7 @@ export const CommentType = new GraphQLObjectType({
         );
       },
     },
+    */
     votes: {
       type: new GraphQLNonNull(VoteConnectionType),
       args: connectionArgs,

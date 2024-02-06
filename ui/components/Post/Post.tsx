@@ -5,8 +5,7 @@ import { PostQuery as PostQueryType } from "./__generated__/PostQuery.graphql";
 import { PostFragment$key } from "./__generated__/PostFragment.graphql";
 import { clsx } from "clsx";
 
-import { CommentTree } from "../Comments/CommentTree";
-import { PostCommentsLoader } from "../Comments/PostCommentsLoader";
+import { PostCommentsLoader } from "../Comments";
 import { VoteButtons } from "../Votes/VoteButtons";
 
 import "./Post.css";
@@ -35,6 +34,7 @@ const PostFragment = graphql`
     user {
       name
     }
+    tags
   }
 `;
 
@@ -42,7 +42,7 @@ export const Post: React.FC<any> = (props) => {
   const { preloadedQuery } = useLoaderData() as any;
   const { node } = usePreloadedQuery<PostQueryType>(PostQuery, preloadedQuery);
   const { commentId } = useParams();
-  console.log("post commentid", commentId);
+  //console.log("post commentid", commentId);
 
   const post = useFragment(PostFragment, node as PostFragment$key);
   //const { node: post } = useLazyLoadQuery<PostQueryType>(PostQuery, { postId: "UG9zdDox" });
@@ -57,6 +57,11 @@ export const Post: React.FC<any> = (props) => {
       <div className="Post">
         <div className="Post--header">
           <h4>{post.title}</h4>
+          <div className="Post--tags">
+            {post.tags.map((tag) => {
+              return <div key={tag}>{tag}</div>;
+            })}
+          </div>
           <p>posted by {post.user?.name ? post.user!.name : "anonymous"}</p>
         </div>
         <div className="Post--body">{post.body}</div>

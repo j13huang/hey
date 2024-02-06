@@ -8,6 +8,10 @@
   display: flex;
 }
 
+.Comment--collapseButton {
+  cursor: pointer;
+}
+
 .Comment--depthSpacers {
   display: flex;
 }

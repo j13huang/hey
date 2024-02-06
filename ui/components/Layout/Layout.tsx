@@ -18,7 +18,7 @@ export const Layout: React.FC<any> = (props) => {
           {location.pathname !== "/posts/new" ? <button onClick={() => navigate("/posts/new")}>new post</button> : null}
         </div>
       </header>
-      <div className="Layout">
+      <div className="Layout--childContainer">
         <Outlet />
       </div>
     </div>

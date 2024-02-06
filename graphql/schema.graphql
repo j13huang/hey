@@ -12,6 +12,7 @@ type Query {
 
     """Returns the last n items from the list."""
     last: Int
+    filter: PostFilter
   ): PostConnection
 
   """get individual comment, and all children comments for this comment"""
@@ -100,20 +101,8 @@ type Post implements Node & Voteable {
     last: Int
   ): CommentConnection!
 
-  """Comments for a post"""
-  commentTree(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): CommentConnection!
+  """tags"""
+  tags: [String!]!
 }
 
 """An object with an ID"""
@@ -210,21 +199,6 @@ type Comment implements Node & Voteable {
   """parent, if null then it's a root level"""
   parent: Comment
   depth: Int!
-
-  """children comments"""
-  children(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): CommentConnection!
   votes(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -266,6 +240,10 @@ type CommentEdge {
   cursor: String!
 }
 
+input PostFilter {
+  tags: [String]
+}
+
 type Mutation {
   newPost(input: NewPostInput!): NewPostPayload
   newComment(input: NewCommentInput!): NewCommentPayload
@@ -282,6 +260,7 @@ type NewPostPayload {
 input NewPostInput {
   title: String!
   body: String!
+  tags: [String!]
   clientMutationId: String
 }
 
